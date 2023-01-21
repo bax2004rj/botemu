@@ -36,6 +36,15 @@ left_up = "backward_key_up"
 down_up = "down_key_up"
 esc_up = "esc_key_up"
 
+fieldUp_down = "fieldUp_down"
+fieldUp_up = "fieldUp_up"
+fieldDown_down = "fieldDown_down"
+fieldDown_up = "fieldDown_up"
+fieldLeft_down = "fieldLeft_down"
+fieldLeft_up = "fieldLeft_up"
+fieldRight_down = "fieldRight_down"
+fieldRight_up = "fieldRight_up"
+
 eventButton = [False,False,False]
 eventPos = [0,0]
 
@@ -90,6 +99,14 @@ def get_events():
                 events.append(left_down)
             if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 events.append(down_down)
+            if event.key == pygame.K_i:
+                events.append(fieldUp_down)
+            if event.key == pygame.K_l:
+                events.append(fieldRight_down)
+            if event.key == pygame.K_j:
+                events.append(fieldLeft_down)
+            if event.key == pygame.K_k:
+                events.append(fieldDown_down)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_down)
@@ -106,6 +123,14 @@ def get_events():
                 events.append(left_up)
             if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 events.append(down_up)
+            if event.key == pygame.K_i:
+                events.append(fieldUp_up)
+            if event.key == pygame.K_l:
+                events.append(fieldRight_up)
+            if event.key == pygame.K_j:
+                events.append(fieldLeft_up)
+            if event.key == pygame.K_k:
+                events.append(fieldDown_up)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_up)

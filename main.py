@@ -46,11 +46,18 @@ recordSec = 00
 zoomScale = 100
 panOffsetX = 0
 panOffsetY = 0
+# Field movement: Mouse
 panStartX = 0
 panStartY = 0
 dragging = False
 dragStartx = 0
 dragStarty = 0
+# Field movement: Keyboard
+moveFieldUp = False
+moveFieldDown = False
+moveFieldLeft = False
+moveFieldRight = False
+moveRate = 1
 
 botX = 0
 botY = 0
@@ -97,18 +104,42 @@ while 1: # Main game loop
         exit()
     elif "mouse_button_down" in events:
         if eventHandler.eventButton == 2:
-            if playfieldRect.collidepoint(eventHandler.eventPos):
-                dragging = True
-                dragStartx,dragStarty = eventHandler.eventPos
-                panStartX = panOffsetX + dragStartx
-                panStartY = panOffsetY + dragStarty
+            dragging = True
+            dragStartx,dragStarty = eventHandler.eventPos
+            panStartX = panOffsetX - dragStartx
+            panStartY = panOffsetY - dragStarty
     elif "mouse_button_up" in events:
         dragging = False
     elif "mouse_motion" in events:
         if dragging == True:
             dragStartx,dragStarty = eventHandler.eventPos
-            panOffsetX = panStartX + dragStartx
-            panOffsetY = panStartY + dragStarty
+            panOffsetX = dragStartx + panStartX
+            panOffsetY = dragStarty + panStartY
+    elif "fieldUp_down" in events:
+        moveFieldUp = True
+    elif "fieldLeft_down" in events:
+        moveFieldLeft = True
+    elif "fieldRight_down" in events:
+        moveFieldRight = True
+    elif "fieldDown_down" in events:
+        moveFieldDown = True
+    elif "fieldUp_up" in events:
+        moveFieldUp = False
+    elif "fieldLeft_up" in events:
+        moveFieldLeft = False
+    elif "fieldRight_up" in events:
+        moveFieldRight = False
+    elif "fieldDown_up" in events:
+        moveFieldDown = False
+    
+    if moveFieldUp:
+        panOffsetY += moveRate
+    if moveFieldLeft:
+        panOffsetX -= moveRate
+    if moveFieldRight:
+        panOffsetX += moveRate
+    if moveFieldDown:
+        panOffsetY -= moveRate
 
 
     # Draw playfield
