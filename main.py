@@ -57,6 +57,8 @@ moveFieldUp = False
 moveFieldDown = False
 moveFieldLeft = False
 moveFieldRight = False
+zoomIn = False
+zoomOut = False
 moveRate = 1
 
 botX = 0
@@ -123,6 +125,10 @@ while 1: # Main game loop
         moveFieldRight = True
     elif "fieldDown_down" in events:
         moveFieldDown = True
+    elif "fieldZoomIn_down" in events:
+        zoomIn = True
+    elif "fieldZoomOut_down" in events:
+        zoomOut = True
     elif "fieldUp_up" in events:
         moveFieldUp = False
     elif "fieldLeft_up" in events:
@@ -131,20 +137,32 @@ while 1: # Main game loop
         moveFieldRight = False
     elif "fieldDown_up" in events:
         moveFieldDown = False
+    elif "fieldZoomIn_up" in events:
+        zoomIn = False
+    elif "fieldZoomOut_up" in events:
+        zoomOut = False
+    elif "mouseWheel" in events and eventHandler.scrollAmount > 0 and zoomScale<1000:
+        zoomScale +=1
+    elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
+        zoomScale -=1
     
     if moveFieldUp:
-        panOffsetY += moveRate
+        panOffsetY += moveRate*zoomScale/100
     if moveFieldLeft:
-        panOffsetX -= moveRate
+        panOffsetX -= moveRate*zoomScale/100
     if moveFieldRight:
-        panOffsetX += moveRate
+        panOffsetX += moveRate*zoomScale/100
     if moveFieldDown:
-        panOffsetY -= moveRate
-
+        panOffsetY -= moveRate*zoomScale/100
+    if zoomIn and zoomScale<1000:
+        zoomScale += 1
+    if zoomOut and zoomScale>10:
+        zoomScale -= 1
 
     # Draw playfield
     screen.fill("#2f2f2f")
-    screen.blit(fileHandler.gameField,(width/2-panOffsetX,height/2-panOffsetY))
+    scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
+    screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
 
     # Draw menus
     pygame.draw.rect(screen,(128,128,128),(0,0,width,24))

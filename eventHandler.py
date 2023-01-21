@@ -3,6 +3,7 @@ import pygame  # To identify event types
 # Custom event names
 terminate = "terminate"
 
+mouse_wheel = "mouse_wheel"
 mouse_motion = "mouse_motion"
 
 mouse_button_down = "mouse_button_down"
@@ -44,15 +45,22 @@ fieldLeft_down = "fieldLeft_down"
 fieldLeft_up = "fieldLeft_up"
 fieldRight_down = "fieldRight_down"
 fieldRight_up = "fieldRight_up"
+fieldZoomIn_down = "fieldZoomIn_down"
+fieldZoomIn_up = "fieldZoomIn_up"
+fieldZoomOut_down = "fieldZoomOut_down"
+fieldZoomOut_up = "fieldZoomOut_up"
+
 
 eventButton = [False,False,False]
 eventPos = [0,0]
+scrollAmount = 0
 
 # Function to return a list of all events in a frame
 # Loops through pygame events, appends them to a list if they are needed, returns list
 def get_events():
     global eventButton
     global eventPos
+    global scrollAmount
 
     events = []
     pygame.event.pump()
@@ -60,6 +68,11 @@ def get_events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             events.append(terminate)
+        
+        if event.type == pygame.MOUSEWHEEL:
+            events.append(mouse_wheel)
+            scrollAmount= event.y
+
 
         if event.type == pygame.MOUSEMOTION:
             events.append(mouse_motion)
@@ -107,6 +120,10 @@ def get_events():
                 events.append(fieldLeft_down)
             if event.key == pygame.K_k:
                 events.append(fieldDown_down)
+            if event.key == pygame.K_u:
+                events.append(fieldZoomIn_down)
+            if event.key == pygame.K_o:
+                events.append(fieldZoomOut_down)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_down)
@@ -131,6 +148,10 @@ def get_events():
                 events.append(fieldLeft_up)
             if event.key == pygame.K_k:
                 events.append(fieldDown_up)
+            if event.key == pygame.K_u:
+                events.append(fieldZoomIn_up)
+            if event.key == pygame.K_o:
+                events.append(fieldZoomOut_up)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_up)
