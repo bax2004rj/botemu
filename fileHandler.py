@@ -13,6 +13,7 @@ music_dir = os.path.join(audio_dir, 'Music')
 player_audio_dir = os.path.join(audio_dir, 'Player')
 textures_dir = os.path.join(current_dir, 'Textures')
 backgrounds_dir = os.path.join(textures_dir, 'Backgrounds')
+game_dir = os.path.join(textures_dir, 'Game')
 
 ui_dir = os.path.join(textures_dir, 'UI')
 
@@ -43,14 +44,14 @@ pause_sound = pygame.mixer.Sound(os.path.join(audio_dir, 'Pause.wav'))
 # Load images
 # Misc. files:
 
-cursor1 = pygame.image.load(os.path.join(ui_dir, 'Cursor.png'))
-cursor2 = pygame.image.load(os.path.join(ui_dir, 'Cursor1.png'))
+cursor1 = pygame.image.load(os.path.join(ui_dir, 'defaultcursor.png'))
+cursor2 = pygame.image.load(os.path.join(ui_dir, 'defaultcursor.png'))
 cursor_files = [cursor1, cursor2]
 
 pygame.font.init()
-font_default = pygame.font.Font(os.path.join(font_dir, 'SourceSansPro-Regular.otf'), 30)
+font_default = pygame.font.Font(os.path.join(font_dir, 'SourceSansPro-Regular.otf'), 25)
 font_big = pygame.font.Font(os.path.join(font_dir, 'SourceSansPro-Regular.otf'), 50)
-font_small = pygame.font.Font(os.path.join(font_dir, 'SourceSansPro-Regular.otf'), 25)
+font_small = pygame.font.Font(os.path.join(font_dir, 'SourceSansPro-Regular.otf'), 14)
 
 # Button files:
 button_select = pygame.image.load(os.path.join(ui_dir, 'Button_select.png'))
@@ -73,25 +74,16 @@ pause_button = pygame.image.load(os.path.join(ui_dir, 'pause.png'))
 pause_hover = pygame.image.load(os.path.join(ui_dir, 'pause_hover.png'))
 pause_click = pygame.image.load(os.path.join(ui_dir, 'pause_click.png'))
 
-# Settings button icons
-settings_button = pygame.image.load(os.path.join(ui_dir, 'settings_button.png'))
-settings_hover = pygame.image.load(os.path.join(ui_dir, 'settings_button_hover.png'))
-settings_select = pygame.image.load(os.path.join(ui_dir, 'settings_button_select.png'))
+# Vex game field parts
+gameField = pygame.image.load(os.path.join(ui_dir, 'gameField.png'))
+blueLowGoal = pygame.image.load(os.path.join(ui_dir, 'blueLowGoal.png'))
+redLowGoal = pygame.image.load(os.path.join(ui_dir, 'redLowGoal.png'))
+blueHighGoal = pygame.image.load(os.path.join(ui_dir, 'blueHighGoal.png'))
+redHighGoal = pygame.image.load(os.path.join(ui_dir, 'redHighGoal.png'))
+disc = pygame.image.load(os.path.join(ui_dir, 'disc.png'))
+selectedDisc = pygame.image.load(os.path.join(ui_dir, 'selectedDisc.png'))
 
-character_files = [pygame.image.load(os.path.join(characters_dir, 'Frame_1.png')),
-               pygame.image.load(os.path.join(characters_dir, 'Frame_2.png')),
-                   pygame.image.load(os.path.join(characters_dir, 'Frame_3.png')),
-               pygame.image.load(os.path.join(characters_dir, 'Frame_4.png')),
-                   pygame.image.load(os.path.join(characters_dir, 'Frame_5.png')),
-               pygame.image.load(os.path.join(characters_dir, 'Frame_6.png')),
-                   pygame.image.load(os.path.join(characters_dir, 'Frame_7.png')),
-               pygame.image.load(os.path.join(characters_dir, 'Frame_8.png')), ]
 
-mint = pygame.image.load(os.path.join(backgrounds_dir, 'Mint.png'))
-stars = [pygame.image.load(os.path.join(backgrounds_dir, 'Stars_1.png')),
-         pygame.image.load(os.path.join(backgrounds_dir,'Stars_2.png')),
-         pygame.image.load(os.path.join(backgrounds_dir, 'Stars_3.png')),
-         pygame.image.load(os.path.join(backgrounds_dir, 'Stars_4.png'))]
 # Create functions so these files are accessible
 def save_data(data):
     with open(os.path.join(save_dir, 's.bin'), 'w') as save_file:
@@ -114,9 +106,6 @@ def get_save_data(data_layout):
             json.dump(data_layout, save_file_3)
         return data_layout
 
-
-def get_character_files():
-    return character_files
 
 
 def get_font_default():
@@ -187,3 +176,6 @@ def get_play_music():
 
 def get_pause_music():
     return pause_music
+
+def get_cursor_files():
+    return cursor_files
