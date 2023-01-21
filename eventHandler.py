@@ -36,10 +36,15 @@ left_up = "backward_key_up"
 down_up = "down_key_up"
 esc_up = "esc_key_up"
 
+eventButton = [False,False,False]
+eventPos = [0,0]
 
 # Function to return a list of all events in a frame
 # Loops through pygame events, appends them to a list if they are needed, returns list
 def get_events():
+    global eventButton
+    global eventPos
+
     events = []
     pygame.event.pump()
 
@@ -49,11 +54,17 @@ def get_events():
 
         if event.type == pygame.MOUSEMOTION:
             events.append(mouse_motion)
+            eventButton = event.buttons
+            eventPos = event.pos
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             events.append(mouse_button_down)
+            eventButton = event.button
+            eventPos = event.pos
+
         if event.type == pygame.MOUSEBUTTONUP:
             events.append(mouse_button_up)
+            eventPos = event.pos
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             events.append(left_mouse_button_down)

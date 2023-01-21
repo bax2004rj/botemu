@@ -28,6 +28,7 @@ cursors[0] = cursors[0].convert_alpha()
 cursors[1] = cursors[1].convert_alpha()
 cursor_state = 0
 cursor_img_rect = cursors[cursor_state].get_rect()
+playfieldRect = fileHandler.gameField.get_rect()
 
 clock = pygame.time.Clock()
 # Font files here
@@ -45,6 +46,11 @@ recordSec = 00
 zoomScale = 100
 panOffsetX = 0
 panOffsetY = 0
+panStartX = 0
+panStartY = 0
+dragging = False
+dragStartx = 0
+dragStarty = 0
 
 botX = 0
 botY = 0
@@ -66,12 +72,15 @@ rScore = 0
 autonTime = 15
 driverControlTime = 165
 
+framelimit = 60000
 
 while 1: # Main game loop
     # Get time, solve for FPS
     ticks = pygame.time.get_ticks()
     delta_time = (ticks - get_ticks_last_frame) / 1000.0
     get_ticks_last_frame = ticks
+    # Get size of rect
+    playfieldRect = fileHandler.gameField.get_rect()
     # Check for window resize
     width,height = screen.get_size()
     # Move record button based on window size
@@ -80,13 +89,32 @@ while 1: # Main game loop
 
     # Check for events
     events = eventHandler.get_events()
+    # Get mouse info for updates
+    cursor_img_rect.topleft = pygame.mouse.get_pos()
     # Check if quitting
     if "terminate" in events:
         pygame.quit()
         exit()
-    # Get mouse info for updates
-    cursor_img_rect.topleft = pygame.mouse.get_pos()
+    elif "mouse_button_down" in events:
+        if eventHandler.eventButton == 2:
+            if playfieldRect.collidepoint(eventHandler.eventPos):
+                dragging = True
+                dragStartx,dragStarty = eventHandler.eventPos
+                panStartX = panOffsetX + dragStartx
+                panStartY = panOffsetY + dragStarty
+    elif "mouse_button_up" in events:
+        dragging = False
+    elif "mouse_motion" in events:
+        if dragging == True:
+            dragStartx,dragStarty = eventHandler.eventPos
+            panOffsetX = panStartX + dragStartx
+            panOffsetY = panStartY + dragStarty
+
+
+    # Draw playfield
     screen.fill("#2f2f2f")
+    screen.blit(fileHandler.gameField,(width/2-panOffsetX,height/2-panOffsetY))
+
     # Draw menus
     pygame.draw.rect(screen,(128,128,128),(0,0,width,24))
     fileButton.active = True
@@ -110,5 +138,5 @@ while 1: # Main game loop
     uiHandler.draw_text(screen,width-110,10,font_small,"Auton: %d:%d"%(modeMinutesRemaining,modeSecondsRemaining),"#000000")
     screen.blit(cursors[0], cursor_img_rect)
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(framelimit)
 

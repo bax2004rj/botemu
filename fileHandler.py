@@ -75,13 +75,13 @@ pause_hover = pygame.image.load(os.path.join(ui_dir, 'pause_hover.png'))
 pause_click = pygame.image.load(os.path.join(ui_dir, 'pause_click.png'))
 
 # Vex game field parts
-gameField = pygame.image.load(os.path.join(ui_dir, 'gameField.png'))
-blueLowGoal = pygame.image.load(os.path.join(ui_dir, 'blueLowGoal.png'))
-redLowGoal = pygame.image.load(os.path.join(ui_dir, 'redLowGoal.png'))
-blueHighGoal = pygame.image.load(os.path.join(ui_dir, 'blueHighGoal.png'))
-redHighGoal = pygame.image.load(os.path.join(ui_dir, 'redHighGoal.png'))
-disc = pygame.image.load(os.path.join(ui_dir, 'disc.png'))
-selectedDisc = pygame.image.load(os.path.join(ui_dir, 'selectedDisc.png'))
+gameField = pygame.image.load(os.path.join(game_dir, 'gameField.png'))
+blueLowGoal = pygame.image.load(os.path.join(game_dir, 'blueLowGoal.png'))
+redLowGoal = pygame.image.load(os.path.join(game_dir, 'redLowGoal.png'))
+blueHighGoal = pygame.image.load(os.path.join(game_dir, 'blueHighGoal.png'))
+redHighGoal = pygame.image.load(os.path.join(game_dir, 'redHighGoal.png'))
+disc = pygame.image.load(os.path.join(game_dir, 'disc.png'))
+selectedDisc = pygame.image.load(os.path.join(game_dir, 'selectedDisc.png'))
 
 
 # Create functions so these files are accessible
