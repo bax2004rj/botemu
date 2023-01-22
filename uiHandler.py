@@ -1,4 +1,5 @@
 import pygame
+import fileHandler
 
 
 # Function to draw rectangles
@@ -33,6 +34,15 @@ def get_text(font, text, rgb="#000000", aa=False):
     text_rect = rendered_text.get_rect()  # Grab the rectangle borders for the text.
     return rendered_text, text_rect
 
+# Mini window system
+class window:
+    def _init_(screen,title,rect,closable,resizable,borderColor,active):
+        content = pygame.Surface((rect[2],rect[3]))
+        content.set_alpha(50)
+        content.fill("#1c1c1c")
+        border = pygame.Surface((rect[2],24))
+        border.fill(borderColor)
+        draw_text(screen,rect[0],rect[1]+12,fileHandler.font_small,title,"#FFFFFF")
 
 # Button system
 class Button:

@@ -50,6 +50,8 @@ recordSec = 00
 zoomScale = 100
 panOffsetX = 0
 panOffsetY = 0
+
+
 # Field movement: Mouse
 panStartX = 0
 panStartY = 0
@@ -77,8 +79,26 @@ gameButton = uiHandler.Button(font_small,30,24,90,0,1,text="Game",button_type="p
 aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="procedural",active=True)
 timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True)
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
-get_ticks_last_frame = 0
 
+# Window definitions here
+performanceWin = uiHandler.window._init_(screen,"Performance",(25,100,200,600),False,False,"#0050cf",True)
+
+#Variables
+get_ticks_last_frame = 0
+# Game scores: High goal
+redHighGoalDisks = 0
+blueHighGoalDisks = 0
+# Game scores: Low goal
+redLowGoalDisks = 0
+blueLowGoalDisks = 0
+# Game scores: Endgame Expansion
+redEndgameTiles = 0
+blueEndgameTiles = 0
+# Game scores: Owned color roller (0:neutral(blue next),1:neutral(red next),2:blue claimed,3:red claimed)
+ColorRoller1Custody = 0
+ColorRoller2Custody = 0
+ColorRoller3Custody = 0
+ColorRoller4Custody = 0
 bScore = 0
 rScore = 0
 
@@ -147,21 +167,31 @@ while 1: # Main game loop
         zoomOut = False
     elif "mouseWheel" in events and eventHandler.scrollAmount > 0 and zoomScale<1000:
         zoomScale +=1
+        uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
     elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
         zoomScale -=1
+        uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
     
-    if moveFieldUp:
-        panOffsetY += moveRate*zoomScale/100
-    if moveFieldLeft:
-        panOffsetX -= moveRate*zoomScale/100
-    if moveFieldRight:
-        panOffsetX += moveRate*zoomScale/100
-    if moveFieldDown:
-        panOffsetY -= moveRate*zoomScale/100
-    if zoomIn and zoomScale<1000:
-        zoomScale += 1
-    if zoomOut and zoomScale>10:
-        zoomScale -= 1
+    # Update and calculate scores TODO: Calculate endgame scores
+    bScore = blueHighGoalDisks*5+blueLowGoalDisks
+    if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
+        bScore += 10
+    if ColorRoller2Custody == 2:
+        bScore += 10
+    if ColorRoller3Custody == 2:
+        bScore += 10
+    if ColorRoller4Custody == 2:
+        bScore += 10
+    rScore = blueHighGoalDisks*5+blueLowGoalDisks
+    if ColorRoller1Custody == 3: # May look weird, but this is to make sure all color rollers are accounted for
+        rScore += 10
+    if ColorRoller2Custody == 3:
+        rScore += 10
+    if ColorRoller3Custody == 3:
+        rScore += 10
+    if ColorRoller4Custody == 3:
+        rScore += 10
+    
 
     # Draw playfield
     screen.fill("#2f2f2f")
@@ -173,13 +203,15 @@ while 1: # Main game loop
     scaledRedLowGoal = pygame.transform.scale(fileHandler.redLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.30,blueHighGoalRect.height*(zoomScale/100)*.25))
     scaledRedLowGoal = pygame.transform.rotate(scaledRedLowGoal,180)
     scaledFieldRect = scaledGameField.get_rect()
-    # Draw objects
+    # Draw game objects
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
     screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
     screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
-    # Draw menus
+    uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
+    uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
+    # Draw top menu bar
     pygame.draw.rect(screen,(128,128,128),(0,0,width,24))
     fileButton.active = True
     fileButton.update(screen,cursor_img_rect,events)
@@ -200,6 +232,23 @@ while 1: # Main game loop
     uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
     uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%d"%(minutesRemaining,secondsRemaining),"#000000")
     uiHandler.draw_text(screen,width-110,10,font_small,"Auton: %d:%d"%(modeMinutesRemaining,modeSecondsRemaining),"#000000")
+
+    # Render last so huds and displays can show overlays
+    if moveFieldUp:
+        panOffsetY += moveRate*zoomScale/100
+    if moveFieldLeft:
+        panOffsetX -= moveRate*zoomScale/100
+    if moveFieldRight:
+        panOffsetX += moveRate*zoomScale/100
+    if moveFieldDown:
+        panOffsetY -= moveRate*zoomScale/100
+    if zoomIn and zoomScale<500:
+        zoomScale += 1
+        uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+    if zoomOut and zoomScale>10:
+        zoomScale -= 1
+        uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+
     screen.blit(cursors[0], cursor_img_rect)
     pygame.display.flip()
     clock.tick(framelimit)
