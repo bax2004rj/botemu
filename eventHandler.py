@@ -21,6 +21,9 @@ right_mouse_button_up = "right_mouse_button_up"
 user_event_1 = "user_event_1"
 user_event_2 = "user_event_2"
 
+space_down = "space_down"
+space_up = "space_up"
+
 key_down = "key_down"
 enter_key_down = "enter_key_down"
 up_down = "up_key_down"
@@ -104,7 +107,9 @@ def get_events():
             events.append(right_mouse_button_up)
         if event.type == pygame.KEYDOWN:
             events.append(key_down)
-            if event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+            if event.key == pygame.K_SPACE:
+                events.append(space_down)
+            if event.key == pygame.K_w or event.key == pygame.K_UP:
                 events.append(up_down)
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 events.append(right_down)
@@ -132,7 +137,9 @@ def get_events():
 
         if event.type == pygame.KEYUP:
             events.append(key_up)
-            if event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+            if event.key == pygame.K_SPACE:
+                events.append(space_up)
+            if event.key == pygame.K_w or event.key == pygame.K_UP:
                 events.append(up_up)
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                 events.append(right_up)

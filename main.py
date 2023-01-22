@@ -4,6 +4,7 @@ import pygame
 import eventHandler
 import uiHandler
 import fileHandler
+import math
 
 pygame.init()
 
@@ -67,6 +68,7 @@ zoomIn = False
 zoomOut = False
 moveRate = 1
 
+# Bot positioning
 botX = 0
 botY = 0
 botDir = 0
@@ -104,6 +106,12 @@ rScore = 0
 
 autonTime = 15
 driverControlTime = 165
+matchTime = 180
+
+timerRunning = False
+totalSecondsRemaining = 180
+
+mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
 
 framelimit = 60000
 
@@ -171,7 +179,21 @@ while 1: # Main game loop
     elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
         zoomScale -=1
         uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-    
+    elif "space_down" in events:
+        if not timerRunning:
+            timerStart_ticks = pygame.time.get_ticks()
+            timerRunning = True
+        else:
+            timerRunning = False
+            totalSecondsRemaining = 180
+
+    if timerRunning:
+        if not totalSecondsRemaining == 0:
+            totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
+        else:
+            timerRunning = False
+            totalSecondsRemaining = 180
+
     # Update and calculate scores TODO: Calculate endgame scores
     bScore = blueHighGoalDisks*5+blueLowGoalDisks
     if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -227,10 +249,17 @@ while 1: # Main game loop
     timerButton.update(screen,cursor_img_rect,events)
     recButton.active = True
     recButton.update(screen,cursor_img_rect,events)
+    
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
     uiHandler.draw_text(screen,width/2,10,font_small,"|","#870087")
     uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
-    uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%d"%(minutesRemaining,secondsRemaining),"#000000")
+    minutesRemaining = math.floor(totalSecondsRemaining/60)
+    secondsRemaining = totalSecondsRemaining-(minutesRemaining*60)
+    if secondsRemaining>10:
+        addzero = ""
+    else:
+        addzero = "0"
+    uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#000000")
     uiHandler.draw_text(screen,width-110,10,font_small,"Auton: %d:%d"%(modeMinutesRemaining,modeSecondsRemaining),"#000000")
 
     # Render last so huds and displays can show overlays
