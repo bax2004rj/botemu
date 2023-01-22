@@ -29,6 +29,10 @@ cursors[1] = cursors[1].convert_alpha()
 cursor_state = 0
 cursor_img_rect = cursors[cursor_state].get_rect()
 playfieldRect = fileHandler.gameField.get_rect()
+redHighGoalRect = fileHandler.redHighGoal.get_rect()
+blueHighGoalRect = fileHandler.blueHighGoal.get_rect()
+redLowGoalRect = fileHandler.redLowGoal.get_rect()
+blueLowGoalRect = fileHandler.blueLowGoal.get_rect()
 
 clock = pygame.time.Clock()
 # Font files here
@@ -161,9 +165,20 @@ while 1: # Main game loop
 
     # Draw playfield
     screen.fill("#2f2f2f")
+    # Scale objects
     scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
+    scaledRedHighGoal = pygame.transform.scale(fileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
+    scaledBlueHighGoal = pygame.transform.scale(fileHandler.blueHighGoal,(blueHighGoalRect.width*(zoomScale/100)*.25,blueHighGoalRect.height*(zoomScale/100)*.25))
+    scaledBlueLowGoal = pygame.transform.scale(fileHandler.blueLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.275,blueHighGoalRect.height*(zoomScale/100)*.25))
+    scaledRedLowGoal = pygame.transform.scale(fileHandler.redLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.30,blueHighGoalRect.height*(zoomScale/100)*.25))
+    scaledRedLowGoal = pygame.transform.rotate(scaledRedLowGoal,180)
+    scaledFieldRect = scaledGameField.get_rect()
+    # Draw objects
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
-
+    screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
+    screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
+    screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
+    screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Draw menus
     pygame.draw.rect(screen,(128,128,128),(0,0,width,24))
     fileButton.active = True
