@@ -1,10 +1,12 @@
 # Pygame
+import math
+
 import pygame
+
 # Custom modules
 import eventHandler
-import uiHandler
 import fileHandler
-import math
+import uiHandler
 
 pygame.init()
 
@@ -69,9 +71,16 @@ zoomOut = False
 moveRate = 1
 
 # Bot positioning
-botX = 0
-botY = 0
+defaultX = 600
+defaultY = 600
+botX = defaultX
+botY = defaultY
 botDir = 0
+moveLeftSide = 0
+moveRightSide = 0
+moveLeft = 0
+moveRight = 0
+
 
 # Button definitions here
 fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True)
@@ -114,6 +123,8 @@ totalSecondsRemaining = 180
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
 
 framelimit = 60000
+
+controlMode = "tank"
 
 while 1: # Main game loop
     # Get time, solve for FPS
@@ -186,6 +197,40 @@ while 1: # Main game loop
         else:
             timerRunning = False
             totalSecondsRemaining = 180
+    elif "up_key_down" in events:
+        moveLeftSide = 128
+    elif "down_key_down" in events:
+        moveLeftSide = -128    
+    elif "left_key_down" in events:
+        moveLeft = 128
+    elif "right_key_down" in events:
+        moveRight = 128
+    elif "right_side_up_down" in events:
+        moveRightSide = 128
+    elif "right_side_down_down" in events:
+        moveRightSide = -128
+    elif "up_key_up" in events:
+        moveLeftSide = 0
+    elif "down_key_up" in events:
+        moveLeftSide = 0    
+    elif "left_key_up" in events:
+        moveLeft = 0
+    elif "right_key_up" in events:
+        moveRight = 0
+    elif "right_side_up_up" in events:
+        moveRightSide = 0
+    elif "right_side_down_up" in events:
+        moveRightSide = 0
+    
+    # Bot control simulation
+    if controlMode == "arcadestrafe":
+        botX += (moveRight-moveLeft)/127
+        botY += (moveLeftSide)/127
+    elif controlMode == "tank":
+        botDir += (moveLeftSide-moveRightSide)/256
+        botX += -((moveLeftSide+moveRightSide)/2)/256 * math.cos(botDir)
+        botY += -((moveLeftSide+moveRightSide)/2)/256 * math.sin(botDir)
+
 
     if timerRunning:
         if not totalSecondsRemaining == 0:
@@ -227,10 +272,15 @@ while 1: # Main game loop
     scaledFieldRect = scaledGameField.get_rect()
     # Draw game objects
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
-    screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
-    screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
+    # Draw bots before anything above it
+    scaledRedBot = pygame.transform.scale(fileHandler.redbot,(64*(zoomScale/100)*.30,64*(zoomScale/100)*.25))
+    scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
+    screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
+    # High goals
+    screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
+    screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
     uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
     uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
     # Draw top menu bar
