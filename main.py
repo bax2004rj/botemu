@@ -267,6 +267,7 @@ while 1: # Main game loop
     screen.fill("#2f2f2f")
     # Scale objects
     scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
+    scaledDisc = pygame.transform.scale(fileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
     scaledRedHighGoal = pygame.transform.scale(fileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
     scaledBlueHighGoal = pygame.transform.scale(fileHandler.blueHighGoal,(blueHighGoalRect.width*(zoomScale/100)*.25,blueHighGoalRect.height*(zoomScale/100)*.25))
     scaledBlueLowGoal = pygame.transform.scale(fileHandler.blueLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.275,blueHighGoalRect.height*(zoomScale/100)*.25))
@@ -278,7 +279,9 @@ while 1: # Main game loop
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Draw bots before anything above it
-    scaledRedBot = pygame.transform.scale(fileHandler.redbot,(64*(zoomScale/50)*.30,64*(zoomScale/50)*.25))
+    for i in discX:
+        screen.blit(scaledDisc,((i*zoomScale/100)+(width/2+panOffsetX),(discY[discX.index(i)]*zoomScale/100)+(width/2+panOffsetY)))
+    scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
     # High goals
