@@ -81,6 +81,9 @@ moveRightSide = 0
 moveLeft = 0
 moveRight = 0
 
+discX = [0,0,0,0]
+discY = [0,100,200,300]
+
 
 # Button definitions here
 fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True)
@@ -228,8 +231,8 @@ while 1: # Main game loop
         botY += (moveLeftSide)/127
     elif controlMode == "tank":
         botDir += (moveLeftSide-moveRightSide)/256
-        botX += -((moveLeftSide+moveRightSide)/2)/256 * math.cos(botDir)
-        botY += -((moveLeftSide+moveRightSide)/2)/256 * math.sin(botDir)
+        botX += ((moveLeftSide+moveRightSide)/2)/256 * math.cos(botDir)
+        botY += ((moveLeftSide+moveRightSide)/2)/256 * math.sin(botDir)
 
 
     if timerRunning:
@@ -275,7 +278,7 @@ while 1: # Main game loop
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Draw bots before anything above it
-    scaledRedBot = pygame.transform.scale(fileHandler.redbot,(64*(zoomScale/100)*.30,64*(zoomScale/100)*.25))
+    scaledRedBot = pygame.transform.scale(fileHandler.redbot,(64*(zoomScale/50)*.30,64*(zoomScale/50)*.25))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
     # High goals
