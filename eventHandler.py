@@ -1,4 +1,5 @@
 import pygame  # To identify event types
+import controllerHandler
 
 # Custom event names
 terminate = "terminate"
@@ -57,6 +58,7 @@ fieldZoomIn_up = "fieldZoomIn_up"
 fieldZoomOut_down = "fieldZoomOut_down"
 fieldZoomOut_up = "fieldZoomOut_up"
 
+control = controllerHandler.controller()
 
 eventButton = [False,False,False]
 eventPos = [0,0]
@@ -68,6 +70,7 @@ def get_events():
     global eventButton
     global eventPos
     global scrollAmount
+    global control
 
     events = []
     pygame.event.pump()
@@ -182,4 +185,10 @@ def get_events():
 
         if event.type == pygame.USEREVENT + 2:
             events.append(user_event_2)
+    try:   
+        controllerHandler.controller.get_axisVal(control)
+    except AttributeError:
+        pass
+
+
     return events
