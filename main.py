@@ -43,6 +43,9 @@ font_default = fileHandler.get_font_default()
 font_big = fileHandler.get_font_big()
 font_small = fileHandler.get_font_small()
 
+compMode = False
+gameStageText = "Auton"
+gameStage = 0 # Game stage 0 = Auton, 1 = DriverControl, 2 = Endgame
 minutesRemaining = 2
 secondsRemaining = 59
 modeMinutesRemaining = 0
@@ -81,8 +84,8 @@ moveRightSide = 0
 moveLeft = 0
 moveRight = 0
 
-discX = [5,100,200,500]
-discY = [0,100,200,300]
+discX = [100,200,300,400,500,600,700]
+discY = [100,200,300,400,500,600,700]
 
 
 # Button definitions here
@@ -291,9 +294,10 @@ while 1: # Main game loop
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Draw bots before anything above it
-    for i in discX:
-        discI = discY[discX.index(i)]
-        screen.blit(scaledDisc,((i*zoomScale/100)+(width/2+panOffsetX),(discI*zoomScale/100)+(height/2+panOffsetY)))
+    for i in range(len(discX)): #Uses length instead of values to support multiple disks at same position 
+        discXI = discX[i]
+        discYI = discY[i]
+        screen.blit(scaledDisc,((discXI*zoomScale/100)+(width/2+panOffsetX),(discYI*zoomScale/100)+(height/2+panOffsetY)))
     scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
@@ -324,12 +328,35 @@ while 1: # Main game loop
     uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
     minutesRemaining = math.floor(totalSecondsRemaining/60)
     secondsRemaining = totalSecondsRemaining-(minutesRemaining*60)
+    
+    if minutesRemaining >=2 and secondsRemaining >= 45:
+        gameStage = 0
+        gameStageText = "Auton"
+        modeMinutesRemaining = 0
+        modeSecondsRemaining = secondsRemaining-45
+    elif minutesRemaining == 0 and secondsRemaining < 10:
+        gameStage = 2
+        gameStageText = "End/DC"
+        modeMinutesRemaining = minutesRemaining
+        modeSecondsRemaining = secondsRemaining
+    else:
+        gameStage = 1
+        gameStageText = "Drive"
+        modeMinutesRemaining = minutesRemaining
+        modeSecondsRemaining = secondsRemaining
+
     if secondsRemaining>10:
         addzero = ""
     else:
         addzero = "0"
+    
+    if modeSecondsRemaining>10:
+        addModeZero = ""
+    else:
+        addModeZero = "0"
+
     uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#000000")
-    uiHandler.draw_text(screen,width-110,10,font_small,"Auton: %d:%d"%(modeMinutesRemaining,modeSecondsRemaining),"#000000")
+    uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#000000")
 
     # Render last so huds and displays can show overlays
     if moveFieldUp:
