@@ -292,7 +292,8 @@ while 1: # Main game loop
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Draw bots before anything above it
     for i in discX:
-        screen.blit(scaledDisc,((i*zoomScale/100)+(width/2+panOffsetX),(discY[discX.index(i)]*zoomScale/100)+(width/2+panOffsetY)))
+        discI = discY[discX.index(i)]
+        screen.blit(scaledDisc,((i*zoomScale/100)+(width/2+panOffsetX),(discI*zoomScale/100)+(height/2+panOffsetY)))
     scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
