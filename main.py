@@ -129,6 +129,36 @@ framelimit = 60000
 
 controlMode = "tank"
 
+def recordBotKeystrokes(events):
+    global moveLeftSide
+    global moveRightSide
+    global moveLeft
+    global moveRight
+    if "up_key_down" in events:
+        moveLeftSide = 128
+    elif "down_key_down" in events:
+        moveLeftSide = -128    
+    elif "left_key_down" in events:
+        moveLeft = 128
+    elif "right_key_down" in events:
+        moveRight = 128
+    elif "right_side_up_down" in events:
+        moveRightSide = 128
+    elif "right_side_down_down" in events:
+        moveRightSide = -128
+    elif "up_key_up" in events:
+        moveLeftSide = 0
+    elif "down_key_up" in events:
+        moveLeftSide = 0    
+    elif "left_key_up" in events:
+        moveLeft = 0
+    elif "right_key_up" in events:
+        moveRight = 0
+    elif "right_side_up_up" in events:
+        moveRightSide = 0
+    elif "right_side_down_up" in events:
+        moveRightSide = 0
+
 while 1: # Main game loop
     # Get time, solve for FPS
     ticks = pygame.time.get_ticks()
@@ -200,44 +230,21 @@ while 1: # Main game loop
         else:
             timerRunning = False
             totalSecondsRemaining = 180
-    if eventHandler.control.joy_name == "":
-        if "up_key_down" in events:
-            moveLeftSide = 128
-        elif "down_key_down" in events:
-            moveLeftSide = -128    
-        elif "left_key_down" in events:
-            moveLeft = 128
-        elif "right_key_down" in events:
-            moveRight = 128
-        elif "right_side_up_down" in events:
-            moveRightSide = 128
-        elif "right_side_down_down" in events:
-            moveRightSide = -128
-        elif "up_key_up" in events:
-            moveLeftSide = 0
-        elif "down_key_up" in events:
-            moveLeftSide = 0    
-        elif "left_key_up" in events:
-            moveLeft = 0
-        elif "right_key_up" in events:
-            moveRight = 0
-        elif "right_side_up_up" in events:
-            moveRightSide = 0
-        elif "right_side_down_up" in events:
-            moveRightSide = 0
-    else:
-        moveLeftSide = eventHandler.control.axis_data[1]*127
-        moveRightSide = eventHandler.control.axis_data[3]*127
+    try:
+        if eventHandler.control.joy_name == "":
+            recordBotKeystrokes(events)
+        else:
+            moveLeftSide = eventHandler.control.axis_data[1]*127
+            moveRightSide = eventHandler.control.axis_data[3]*127
+    except AttributeError:
+        recordBotKeystrokes(events)
 
     
     # Bot control simulation
-    if controlMode == "arcadestrafe":
-        botX += (moveRight-moveLeft)/127
-        botY += (moveLeftSide)/127
-    elif controlMode == "tank":
-        botDir += (moveLeftSide-moveRightSide)/256
-        botX += ((moveLeftSide+moveRightSide)/256) * math.cos(botDir)
-        botY += ((moveLeftSide+moveRightSide)/256) * math.sin(botDir)
+    botDir += (moveLeftSide-moveRightSide)/256
+    botRadians = math.radians(botDir-180)
+    botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
+    botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
 
 
     if timerRunning:
