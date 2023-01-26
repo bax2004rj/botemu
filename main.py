@@ -103,6 +103,7 @@ performanceWin = uiHandler.window._init_(screen,"Performance",(25,100,200,600),F
 #Variables
 get_ticks_last_frame = 0
 # Game scores: High goal
+botHeldDisks = 0
 redHighGoalDisks = 0
 blueHighGoalDisks = 0
 # Game scores: Low goal
@@ -293,14 +294,15 @@ while 1: # Main game loop
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
-    # Draw bots before anything above it
     for i in range(len(discX)): #Uses length instead of values to support multiple disks at same position 
         discXI = discX[i]
         discYI = discY[i]
         screen.blit(scaledDisc,((discXI*zoomScale/100)+(width/2+panOffsetX),(discYI*zoomScale/100)+(height/2+panOffsetY)))
+    # Draw bots before anything above it
     scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
+    uiHandler.draw_text(screen,(width/2+panOffsetX)+((botX+32)*zoomScale/100),(height/2+panOffsetY)+((botY+32)*zoomScale/100),font_default,"%d"%botHeldDisks,"#FFFFFF")
     # High goals
     screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
     screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
