@@ -345,12 +345,12 @@ while 1: # Main game loop
         modeMinutesRemaining = minutesRemaining
         modeSecondsRemaining = secondsRemaining
 
-    if secondsRemaining>10:
+    if secondsRemaining>=10:
         addzero = ""
     else:
         addzero = "0"
     
-    if modeSecondsRemaining>10:
+    if modeSecondsRemaining>=10:
         addModeZero = ""
     else:
         addModeZero = "0"
