@@ -81,7 +81,7 @@ moveRightSide = 0
 moveLeft = 0
 moveRight = 0
 
-discX = [0,0,0,0]
+discX = [5,100,200,500]
 discY = [0,100,200,300]
 
 
@@ -134,30 +134,31 @@ def recordBotKeystrokes(events):
     global moveRightSide
     global moveLeft
     global moveRight
-    if "up_key_down" in events:
-        moveLeftSide = 128
-    elif "down_key_down" in events:
-        moveLeftSide = -128    
-    elif "left_key_down" in events:
-        moveLeft = 128
-    elif "right_key_down" in events:
-        moveRight = 128
-    elif "right_side_up_down" in events:
-        moveRightSide = 128
-    elif "right_side_down_down" in events:
-        moveRightSide = -128
-    elif "up_key_up" in events:
-        moveLeftSide = 0
-    elif "down_key_up" in events:
-        moveLeftSide = 0    
-    elif "left_key_up" in events:
-        moveLeft = 0
-    elif "right_key_up" in events:
-        moveRight = 0
-    elif "right_side_up_up" in events:
-        moveRightSide = 0
-    elif "right_side_down_up" in events:
-        moveRightSide = 0
+    if controlMode == "tank":
+        if "up_key_down" in events:
+            moveLeftSide = -128
+        elif "down_key_down" in events:
+            moveLeftSide = 128    
+        elif "left_key_down" in events:
+            moveLeft = 128
+        elif "right_key_down" in events:
+            moveRight = 128
+        elif "right_side_up_down" in events:
+            moveRightSide = -128
+        elif "right_side_down_down" in events:
+            moveRightSide = 128
+        elif "up_key_up" in events:
+            moveLeftSide = 0
+        elif "down_key_up" in events:
+            moveLeftSide = 0    
+        elif "left_key_up" in events:
+            moveLeft = 0
+        elif "right_key_up" in events:
+            moveRight = 0
+        elif "right_side_up_up" in events:
+            moveRightSide = 0
+        elif "right_side_down_up" in events:
+            moveRightSide = 0
 
 while 1: # Main game loop
     # Get time, solve for FPS
