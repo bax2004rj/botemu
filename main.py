@@ -52,11 +52,7 @@ modeMinutesRemaining = 0
 modeSecondsRemaining = 15
 recordMin = 0
 recordSec = 00
-
 zoomScale = 100
-panOffsetX = 0
-panOffsetY = 0
-
 
 # Field movement: Mouse
 panStartX = 0
@@ -64,6 +60,9 @@ panStartY = 0
 dragging = False
 dragStartx = 0
 dragStarty = 0
+panOffsetX = 0
+panOffsetY = 0
+
 # Field movement: Keyboard
 moveFieldUp = False
 moveFieldDown = False
@@ -74,8 +73,8 @@ zoomOut = False
 moveRate = 1
 
 # Bot positioning
-defaultX = 600
-defaultY = 600
+defaultX = 450
+defaultY = 725
 botX = defaultX
 botY = defaultY
 botDir = 0
@@ -98,8 +97,8 @@ timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
 
 # Window definitions here
-performanceWin = uiHandler.window._init_(screen,"Performance",(25,100,200,600),False,False,"#0050cf",True)
-posWin = uiHandler.window._init_(screen,"Positions",(50,125,200,600),False,False,"#5000cf",True)
+performanceWin = uiHandler.window(screen,"Performance",(25,100,200,400),False,False,"#0050cf",True)
+posWin = uiHandler.window(screen,"Positions",(50,125,200,400),True,False,"#5000cf",True)
 
 #Variables
 get_ticks_last_frame = 0
@@ -164,6 +163,27 @@ def recordBotKeystrokes(events):
             moveRightSide = 0
         elif "right_side_down_up" in events:
             moveRightSide = 0
+
+def displayPerformanceStats(screen,clock,win,events):
+    if win.active:
+        fps = clock.get_fps()
+        fpsColor = "#ffffff"
+        if fps > 30:
+            fpsColor = "#00ff00"
+        if fps <= 30 and fps >= 15:
+            fpsColor = "#ffff00"
+        else:
+            fpsColor = "#ff0000"
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"FPS:%d"%fps,fpsColor)
+
+def displayPositionStats(screen,clock,win,events):
+    global botX
+    global botY
+    global botDir
+    if win.active:
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%botX,"#FF0000")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%botY,"#00FF00")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
 
 while 1: # Main game loop
     # Get time, solve for FPS
@@ -360,7 +380,12 @@ while 1: # Main game loop
 
     uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#000000")
     uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#000000")
-
+    # Run window tasks
+    displayPerformanceStats(screen,clock,performanceWin,events)
+    displayPositionStats(screen,clock,posWin,events)
+    # Draw windows
+    posWin.update(screen,cursor_img_rect,events)
+    performanceWin.update(screen,cursor_img_rect,events)
     # Render last so huds and displays can show overlays
     if moveFieldUp:
         panOffsetY += moveRate*zoomScale/100
