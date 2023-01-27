@@ -99,6 +99,7 @@ recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",bu
 
 # Window definitions here
 performanceWin = uiHandler.window._init_(screen,"Performance",(25,100,200,600),False,False,"#0050cf",True)
+posWin = uiHandler.window._init_(screen,"Positions",(50,125,200,600),False,False,"#5000cf",True)
 
 #Variables
 get_ticks_last_frame = 0
@@ -129,7 +130,7 @@ totalSecondsRemaining = 180
 
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
 
-framelimit = 60000
+framelimit = 60
 
 controlMode = "tank"
 
@@ -140,17 +141,17 @@ def recordBotKeystrokes(events):
     global moveRight
     if controlMode == "tank":
         if "up_key_down" in events:
-            moveLeftSide = -128
+            moveLeftSide = -512
         elif "down_key_down" in events:
-            moveLeftSide = 128    
+            moveLeftSide = 512   
         elif "left_key_down" in events:
-            moveLeft = 128
+            moveLeft = 512
         elif "right_key_down" in events:
-            moveRight = 128
+            moveRight = 512
         elif "right_side_up_down" in events:
-            moveRightSide = -128
+            moveRightSide = -512
         elif "right_side_down_down" in events:
-            moveRightSide = 128
+            moveRightSide = 512
         elif "up_key_up" in events:
             moveLeftSide = 0
         elif "down_key_up" in events:
@@ -239,8 +240,8 @@ while 1: # Main game loop
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
         else:
-            moveLeftSide = eventHandler.control.axis_data[1]*127
-            moveRightSide = eventHandler.control.axis_data[3]*127
+            moveLeftSide = eventHandler.control.axis_data[1]*512
+            moveRightSide = eventHandler.control.axis_data[3]*512
     except AttributeError:
         recordBotKeystrokes(events)
 
