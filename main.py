@@ -97,8 +97,8 @@ timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
 
 # Window definitions here
-performanceWin = uiHandler.window(screen,"Performance",(25,100,200,400),False,False,"#0050cf",True)
-posWin = uiHandler.window(screen,"Positions",(50,125,200,400),True,False,"#5000cf",True)
+performanceWin = uiHandler.window(screen,"Performance",(25,100,200,150),True,False,"#0050cf",True)
+posWin = uiHandler.window(screen,"Positions",(25,225,200,150),True,False,"#5000cf",True)
 
 #Variables
 get_ticks_last_frame = 0
@@ -172,9 +172,11 @@ def displayPerformanceStats(screen,clock,win,events):
             fpsColor = "#00ff00"
         if fps <= 30 and fps >= 15:
             fpsColor = "#ffff00"
-        else:
+        if fps <15:
             fpsColor = "#ff0000"
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"FPS:%d"%fps,fpsColor)
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+70,font_small,"Viewport:%dx%d"%(width,height),"#FFFFFF")
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+90,font_small,"Resolution:%dx%d"%(width,height),"#FFFFFF")
 
 def displayPositionStats(screen,clock,win,events):
     global botX
@@ -184,6 +186,9 @@ def displayPositionStats(screen,clock,win,events):
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%botX,"#FF0000")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%botY,"#00FF00")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
 
 while 1: # Main game loop
     # Get time, solve for FPS

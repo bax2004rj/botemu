@@ -56,7 +56,7 @@ class window:
         self.content.set_alpha(50)
         self.content.fill("#1c1c1c")
         if closable:
-            self.closeButton = Button(fileHandler.font_small,self.rect[0]-24,24,self.rect[2]+24,self.rect[1],1,text_color="#ff0000",hover_text_color="#ffffff",hover_box_color="#ff0000",text="X")
+            self.closeButton = Button(fileHandler.font_small,24,24,0,0,0,text_color="#ff0000",hover_text_color="#ffffff",hover_box_color="#ff0000",text="X")
         self.panStartX = 0
         self.panStartY = 0
         self.dragging = False
@@ -75,17 +75,20 @@ class window:
             self.adjustedRectY = self.rect[1] + self.panOffsetY
             self.adjustedWidth = self.rect[2] + self.panOffsetX
             self.adjustedHeight = self.rect[3] + self.panOffsetY
+            self.checkRect = pygame.Rect((self.adjustedRectX,self.adjustedRectY),(self.adjustedWidth,self.adjustedHeight))
             screen.blit(self.content,(self.adjustedRectX,self.adjustedRectY))
             screen.blit(self.border,(self.adjustedRectX,self.adjustedRectY))
             draw_text(screen,(self.adjustedRectX+self.adjustedWidth)/2,self.adjustedRectY+12,fileHandler.font_small,self.title,"#FFFFFF")
             try:
+                self.closeButton.button_box_rect.topleft = self.adjustedWidth,self.adjustedRectY
+                self.closeButton.outline_rect.topleft = self.adjustedWidth,self.adjustedRectY
                 self.closeButton.update(screen,cursor_rect,events)
                 if self.closeButton.clicked_up:
                     self.active = False
             except Exception:
                 pass
             if "mouse_button_down" in events:
-                if eventHandler.eventButton == 1 and self.border.get_rect().collidepoint(cursor_rect.x,cursor_rect.y):
+                if eventHandler.eventButton == 1 and self.checkRect.collidepoint(cursor_rect.x,cursor_rect.y):
                     self.dragging = True
                     self.dragStartx,self.dragStarty = eventHandler.eventPos
                     self.panStartX = self.panOffsetX - self.dragStartx
@@ -93,7 +96,7 @@ class window:
             elif "mouse_button_up" in events:
                 self.dragging = False
             elif "mouse_motion" in events:
-                if self.dragging and self.border.get_rect().collidepoint(cursor_rect.x,cursor_rect.y):
+                if self.dragging and self.checkRect.collidepoint(cursor_rect.x,cursor_rect.y):
                     self.dragStartx,self.dragStarty = eventHandler.eventPos
                     self.panOffsetX = self.dragStartx + self.panStartX
                     self.panOffsetY = self.dragStarty + self.panStartY
