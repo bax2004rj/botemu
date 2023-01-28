@@ -137,28 +137,30 @@ totalSecondsRemaining = 180
 
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
 
-framelimit = 60
+framelimit = 6000000000000
+fpsSpeedScale = 10
+fps = 60
 
 controlMode = "tank"
 
-def recordBotKeystrokes(events):
+def recordBotKeystrokes(events,fps):
     global moveLeftSide
     global moveRightSide
     global moveLeft
     global moveRight
     if controlMode == "tank":
         if "up_key_down" in events:
-            moveLeftSide = -512
+            moveLeftSide = -512/fps
         elif "down_key_down" in events:
-            moveLeftSide = 512   
+            moveLeftSide = 512/fps
         elif "left_key_down" in events:
-            moveLeft = 512
+            moveLeft = 512/fps
         elif "right_key_down" in events:
-            moveRight = 512
+            moveRight = 512/fps
         elif "right_side_up_down" in events:
-            moveRightSide = -512
+            moveRightSide = -512/(fps/60)
         elif "right_side_down_down" in events:
-            moveRightSide = 512
+            moveRightSide = 512/(fps/60)
         elif "up_key_up" in events:
             moveLeftSide = 0
         elif "down_key_up" in events:
@@ -173,6 +175,7 @@ def recordBotKeystrokes(events):
             moveRightSide = 0
 
 def displayPerformanceStats(screen,clock,win,events):
+    global fpsSpeedScale
     if win.active:
         fps = clock.get_fps()
         fpsColor = "#ffffff"
@@ -182,9 +185,10 @@ def displayPerformanceStats(screen,clock,win,events):
             fpsColor = "#ffff00"
         if fps <15:
             fpsColor = "#ff0000"
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"FPS:%d"%fps,fpsColor)
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+30,font_small,"FPS:%d"%fps,fpsColor)
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+70,font_small,"Viewport:%dx%d"%(width,height),"#FFFFFF")
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+90,font_small,"Resolution:%dx%d"%(width,height),"#FFFFFF")
+        uiHandler.draw_text(screen,win.adjustedRectX+100,win.adjustedRectY+50,font_small,"Movement scale:%f"%fpsSpeedScale,fpsColor)
 
 def displayPositionStats(screen,clock,win,events):
     global botX
@@ -208,6 +212,12 @@ def renderView(screen,events):
 while 1: # Main game loop
     # Get time, solve for FPS
     ticks = pygame.time.get_ticks()
+    fps = clock.get_fps()
+    try:
+        fpsSpeedScale = fps/60
+    except Exception:
+        fpsSpeedScale = 10
+        print("Warning: 0 FPS, temporarily scaling speed to 1")
     delta_time = (ticks - get_ticks_last_frame) / 1000.0
     get_ticks_last_frame = ticks
     # Get size of rect
@@ -280,10 +290,10 @@ while 1: # Main game loop
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
         else:
-            moveLeftSide = eventHandler.control.axis_data[1]*512
-            moveRightSide = eventHandler.control.axis_data[3]*512
-    except AttributeError:
-        recordBotKeystrokes(events)
+            moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
+            moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
+    except Exception:
+        recordBotKeystrokes(events,fpsSpeedScale)
 
     
     # Bot control simulation
