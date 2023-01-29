@@ -90,6 +90,7 @@ discY = [100,200,300,400,500,600,700]
 
 
 # Button definitions here
+# Menu bar
 fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True)
 editButton = uiHandler.Button(font_small,30,24,30,0,1,text="Edit",button_type="procedural",active=True)
 viewButton = uiHandler.Button(font_small,30,24,60,0,1,text="View",button_type="procedural",active=True)
@@ -97,6 +98,10 @@ gameButton = uiHandler.Button(font_small,30,24,90,0,1,text="Game",button_type="p
 aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="procedural",active=True)
 timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True)
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
+#Menu options
+performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance")
+positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions")
+motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "✅ Motors")
 
 fileOpen = False
 editOpen = False
@@ -109,6 +114,7 @@ recOpen = False
 # Window definitions here
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
+motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",True)
 
 #Variables
 get_ticks_last_frame = 0
@@ -139,7 +145,7 @@ totalSecondsRemaining = 180
 
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
 
-framelimit = 6000000000000
+framelimit = -1
 fpsSpeedScale = 10
 fps = 60
 
@@ -212,12 +218,39 @@ def displayPositionStats(screen,clock,win,events):
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
 
-def renderView(screen,events):
+def renderView(screen,cursor_img_rect,events):
     global viewOpen
     if viewOpen:
         pygame.draw.rect(screen,(16,16,16),(60,24,100,200))
-        if "mouse_button_up" in events:
+        performanceButton.active = True
+        performanceButton.update(screen,cursor_img_rect,events)
+        positionsButton.active = True
+        positionsButton.update(screen,cursor_img_rect,events)
+        motorsButton.active = True
+        motorsButton.update(screen,cursor_img_rect,events)
+        if "mouse_button_up" in events and not viewButton.clicked_up:
             viewOpen = False
+            performanceButton.active = False
+            positionsButton.active = False
+            motorsButton.active = False
+        if performanceButton.clicked_up and performanceWin.active:
+            performanceWin.active = False
+            performanceButton.text = "  Performance"
+        elif performanceButton.clicked_up and not performanceWin.active:
+            performanceWin.active = True
+            performanceButton.text = "✅ Performance"
+        if positionsButton.clicked_up and posWin.active:
+            posWin.active = False
+            positionsButton.text = "  Positions"
+        elif positionsButton.clicked_up and not posWin.active:
+            posWin.active = True
+            positionsButton.text = "✅ Positions"
+        if motorsButton.clicked_up and motorWin.active:
+            motorWin.active = False
+            motorsButton.text = "  Motors"
+        elif motorsButton.clicked_up and not motorWin.active:
+            motorWin.active = True
+            motorsButton.text = "✅ Motors"
 
 while 1: # Main game loop
     # Get time, solve for FPS
@@ -386,10 +419,10 @@ while 1: # Main game loop
     recButton.active = True
     recButton.update(screen,cursor_img_rect,events)
     # Update menu items
-    if viewButton.clicked_up:
+    if viewButton.clicked_down:
         viewOpen = True
     # Draw menu items
-    renderView(screen,events)
+    renderView(screen,cursor_img_rect,events)
     
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
     uiHandler.draw_text(screen,width/2,10,font_small,"|","#870087")
@@ -431,6 +464,7 @@ while 1: # Main game loop
     # Draw windows
     posWin.update(screen,cursor_img_rect,events)
     performanceWin.update(screen,cursor_img_rect,events)
+    motorWin.update(screen,cursor_img_rect,events)
     # Render last so huds and displays can show overlays
     if moveFieldUp:
         panOffsetY += moveRate*zoomScale/100
