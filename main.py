@@ -1,12 +1,14 @@
 # Pygame
 import math
-
 import pygame
 
 # Custom modules
 import eventHandler
 import fileHandler
 import uiHandler
+
+#Other
+import psutil
 
 pygame.init()
 
@@ -105,8 +107,8 @@ timerOpen = False
 recOpen = False
 
 # Window definitions here
-performanceWin = uiHandler.window(screen,"Performance",(25,100,200,150),True,False,"#0050cf",True)
-posWin = uiHandler.window(screen,"Positions",(25,225,200,150),True,False,"#5000cf",True)
+performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
+posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
 
 #Variables
 get_ticks_last_frame = 0
@@ -185,10 +187,18 @@ def displayPerformanceStats(screen,clock,win,events):
             fpsColor = "#ffff00"
         if fps <15:
             fpsColor = "#ff0000"
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+30,font_small,"FPS:%d"%fps,fpsColor)
-        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+70,font_small,"Viewport:%dx%d"%(width,height),"#FFFFFF")
-        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+90,font_small,"Resolution:%dx%d"%(width,height),"#FFFFFF")
-        uiHandler.draw_text(screen,win.adjustedRectX+100,win.adjustedRectY+50,font_small,"Movement scale:%f"%fpsSpeedScale,fpsColor)
+            fps = clock.get_fps()
+        cpu = psutil.cpu_percent()
+        cpuColor = "#ffffff"
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+30,font_small,"----Graphics----","#00ffff")
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+50,font_small,"FPS:%d"%fps,fpsColor)
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+90,font_small,"Viewport:%dx%d"%(width,height),"#FFFFFF")
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+110,font_small,"Resolution:%dx%d"%(width,height),"#FFFFFF")
+        uiHandler.draw_text(screen,win.adjustedRectX+100,win.adjustedRectY+70,font_small,"Movement scale:%f"%fpsSpeedScale,fpsColor)
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+130,font_small,"Framelimit:%d"%(framelimit),"#FFFFFF")
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+150,font_small,"-------CPU-------","#870087")
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+170,font_small,"Usage:{0}".format(cpu),cpuColor)
+        uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+190,font_small,"Cores:{0}".format(psutil.cpu_count()),cpuColor)
 
 def displayPositionStats(screen,clock,win,events):
     global botX
