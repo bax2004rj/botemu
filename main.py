@@ -176,9 +176,9 @@ def recordBotKeystrokes(events,fps):
         elif "right_key_down" in events:
             moveRight = 512/fps
         elif "right_side_up_down" in events:
-            moveRightSide = -512/(fps/60)
+            moveRightSide = -512/fps
         elif "right_side_down_down" in events:
-            moveRightSide = 512/(fps/60)
+            moveRightSide = 512/fps
         elif "up_key_up" in events:
             moveLeftSide = 0
         elif "down_key_up" in events:
