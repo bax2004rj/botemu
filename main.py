@@ -54,6 +54,8 @@ modeMinutesRemaining = 0
 modeSecondsRemaining = 15
 recordMin = 0
 recordSec = 00
+
+# Zoom data 
 zoomScale = 100
 
 # Field movement: Mouse
@@ -98,10 +100,16 @@ gameButton = uiHandler.Button(font_small,30,24,90,0,1,text="Game",button_type="p
 aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="procedural",active=True)
 timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True)
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
-#Menu options
+#View Menu options
 performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance")
 positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions")
 motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "✅ Motors")
+# Timer menu options
+compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp")
+autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton")
+driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skills: Driver")
+noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch")
+runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)")
 
 fileOpen = False
 editOpen = False
@@ -144,6 +152,8 @@ timerRunning = False
 totalSecondsRemaining = 180
 
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
+timerStart_ticks = 0
+
 
 framelimit = -1
 fpsSpeedScale = 10
@@ -221,7 +231,7 @@ def displayPositionStats(screen,clock,win,events):
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
     if viewOpen:
-        pygame.draw.rect(screen,(16,16,16),(60,24,100,200))
+        pygame.draw.rect(screen,(16,16,16),(120,24,100,200))
         performanceButton.active = True
         performanceButton.update(screen,cursor_img_rect,events)
         positionsButton.active = True
@@ -251,6 +261,31 @@ def renderView(screen,cursor_img_rect,events):
         elif motorsButton.clicked_up and not motorWin.active:
             motorWin.active = True
             motorsButton.text = "✅ Motors"
+
+def renderTimer(screen,cursor_img_rect,events):
+    global timerOpen
+    global timerRunning
+    global timerStart_ticks
+    if timerOpen:
+        pygame.draw.rect(screen,(16,16,16),(140,24,100,200))
+        compModeButton.active = True
+        compModeButton.update(screen,cursor_img_rect,events)
+        autonSkillsButton.active = True
+        autonSkillsButton.update(screen,cursor_img_rect,events)
+        driverSkillsButton.active = True
+        driverSkillsButton.update(screen,cursor_img_rect,events)
+        noTimerButton.active = True
+        noTimerButton.update(screen,cursor_img_rect,events)
+        uiHandler.draw_text(screen,190,132,font_small,"---Controls---","#878787")
+        runTimerButton.active = True
+        runTimerButton.update(screen,cursor_img_rect,events)
+        if "mouse_button_up" in events and not timerButton.clicked_up:
+            timerOpen = False
+            compModeButton.active = False
+            autonSkillsButton.active = False
+            driverSkillsButton.active = False
+            noTimerButton.active = False
+            runTimerButton.active = False
 
 while 1: # Main game loop
     # Get time, solve for FPS
@@ -322,12 +357,14 @@ while 1: # Main game loop
     elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
         zoomScale -=1
         uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-    elif "space_down" in events:
-        if not timerRunning:
+    elif runTimerButton.clicked_up or "space_down" in events: 
+        if timerRunning:
             timerStart_ticks = pygame.time.get_ticks()
-            timerRunning = True
-        else:
             timerRunning = False
+            runTimerButton.text = "Run timer (space)"
+        else:
+            timerRunning = True
+            runTimerButton.text = "Stop timer (space)"
             totalSecondsRemaining = 180
     try:
         if eventHandler.control.joy_name == "":
@@ -344,14 +381,6 @@ while 1: # Main game loop
     botRadians = math.radians(botDir-180)
     botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
     botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
-
-
-    if timerRunning:
-        if not totalSecondsRemaining == 0:
-            totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
-        else:
-            timerRunning = False
-            totalSecondsRemaining = 180
 
     # Update and calculate scores TODO: Calculate endgame scores
     bScore = blueHighGoalDisks*5+blueLowGoalDisks
@@ -421,9 +450,19 @@ while 1: # Main game loop
     # Update menu items
     if viewButton.clicked_down:
         viewOpen = True
+    if timerButton.clicked_down:
+        timerOpen = True
     # Draw menu items
     renderView(screen,cursor_img_rect,events)
+    renderTimer(screen,cursor_img_rect,events)
     
+    if timerRunning:
+        if not totalSecondsRemaining == 0:
+            totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
+        else:
+            timerRunning = False
+            totalSecondsRemaining = 180
+
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
     uiHandler.draw_text(screen,width/2,10,font_small,"|","#870087")
     uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
