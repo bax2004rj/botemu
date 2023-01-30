@@ -75,8 +75,8 @@ zoomOut = False
 moveRate = 1
 
 # Bot positioning
-defaultX = 450
-defaultY = 725
+defaultX = 465
+defaultY = 730
 botX = defaultX
 botY = defaultY
 botDir = 0
@@ -211,8 +211,8 @@ def displayPositionStats(screen,clock,win,events):
     global botY
     global botDir
     if win.active:
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%botX,"#FF0000")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%botY,"#00FF00")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
