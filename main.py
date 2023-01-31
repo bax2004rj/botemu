@@ -148,6 +148,7 @@ autonTime = 15
 driverControlTime = 165
 matchTime = 180
 
+timerMode = "comp"
 timerRunning = False
 totalSecondsRemaining = 180
 
@@ -265,6 +266,7 @@ def renderView(screen,cursor_img_rect,events):
 def renderTimer(screen,cursor_img_rect,events):
     global timerOpen
     global timerRunning
+    global timerMode
     global timerStart_ticks
     if timerOpen:
         pygame.draw.rect(screen,(16,16,16),(140,24,100,200))
@@ -286,6 +288,31 @@ def renderTimer(screen,cursor_img_rect,events):
             driverSkillsButton.active = False
             noTimerButton.active = False
             runTimerButton.active = False
+        if compModeButton.clicked_up:
+            compModeButton.text = "✅ Comp"
+            autonSkillsButton.text = "  Skills: Auton"
+            driverSkillsButton.text = "  Skills: Driver"
+            noTimerButton.text = "  Stopwatch"
+            timerMode = "comp"
+        if autonSkillsButton.clicked_up:
+            compModeButton.text = " Comp"
+            autonSkillsButton.text = "✅ Skills: Auton"
+            driverSkillsButton.text = "  Skills: Driver"
+            noTimerButton.text = "  Stopwatch"
+            timerMode = "sa"
+        if driverSkillsButton.clicked_up:
+            compModeButton.text = "  Comp"
+            autonSkillsButton.text = "  Skills: Auton"
+            driverSkillsButton.text = "✅ Skills: Driver"
+            noTimerButton.text = "  Stopwatch"
+            timerMode = "sd"
+        if noTimerButton.clicked_up:
+            compModeButton.text = "  Comp"
+            autonSkillsButton.text = "  Skills: Auton"
+            driverSkillsButton.text = "  Skills: Driver"
+            noTimerButton.text = "✅ Stopwatch"
+            timerMode = "disable"
+        
 
 while 1: # Main game loop
     # Get time, solve for FPS
@@ -365,7 +392,12 @@ while 1: # Main game loop
         else:
             timerRunning = True
             runTimerButton.text = "Stop timer (space)"
-            totalSecondsRemaining = 180
+            if timerMode == "comp":
+                totalSecondsRemaining = 180
+            if timerMode == "sa" or timerMode == "sd":
+                totalSecondsRemaining = 60
+            if timerMode == "disabled":
+                totalSecondsRemaining = -1
     try:
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
@@ -457,33 +489,48 @@ while 1: # Main game loop
     renderTimer(screen,cursor_img_rect,events)
     
     if timerRunning:
-        if not totalSecondsRemaining == 0:
-            totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
+        if not timerMode == "disabled":
+            if not totalSecondsRemaining == 0:
+                totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
+            else:
+                timerRunning = False
         else:
-            timerRunning = False
-            totalSecondsRemaining = 180
+            totalSecondsRemaining = math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
 
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
     uiHandler.draw_text(screen,width/2,10,font_small,"|","#870087")
     uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
     minutesRemaining = math.floor(totalSecondsRemaining/60)
     secondsRemaining = totalSecondsRemaining-(minutesRemaining*60)
-    
-    if minutesRemaining >=2 and secondsRemaining >= 45:
-        gameStage = 0
-        gameStageText = "Auton"
-        modeMinutesRemaining = 0
-        modeSecondsRemaining = secondsRemaining-45
-    elif minutesRemaining == 0 and secondsRemaining < 10:
-        gameStage = 2
+
+    if timerMode == "comp":    
+        if minutesRemaining >=2 and secondsRemaining >= 45:
+            gameStage = 0
+            gameStageText = "Auton"
+            modeMinutesRemaining = 0
+            modeSecondsRemaining = secondsRemaining-45
+        elif minutesRemaining == 0 and secondsRemaining < 10:
+            gameStage = 2
+            gameStageText = "End/DC"
+            modeMinutesRemaining = minutesRemaining
+            modeSecondsRemaining = secondsRemaining
+        else:
+            gameStage = 1
+            gameStageText = "Drive"
+            modeMinutesRemaining = minutesRemaining
+            modeSecondsRemaining = secondsRemaining
+    elif timerMode == "sa":
+        gameStageText = "End/AT"
+        modeMinutesRemaining = minutesRemaining
+        modeSecondsRemaining = secondsRemaining
+    elif timerMode == "sd":
         gameStageText = "End/DC"
         modeMinutesRemaining = minutesRemaining
         modeSecondsRemaining = secondsRemaining
     else:
-        gameStage = 1
-        gameStageText = "Drive"
-        modeMinutesRemaining = minutesRemaining
-        modeSecondsRemaining = secondsRemaining
+        gameStageText = "Inf/DC"
+        modeMinutesRemaining = 99
+        modeSecondsRemaining = 99
 
     if secondsRemaining>=10:
         addzero = ""
