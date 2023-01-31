@@ -394,10 +394,13 @@ while 1: # Main game loop
             runTimerButton.text = "Stop timer (space)"
             if timerMode == "comp":
                 totalSecondsRemaining = 180
+                matchTime = 180
             if timerMode == "sa" or timerMode == "sd":
                 totalSecondsRemaining = 60
+                matchTime = 60
             if timerMode == "disabled":
                 totalSecondsRemaining = -1
+                matchTime = 1
     try:
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
@@ -449,7 +452,20 @@ while 1: # Main game loop
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
-    for i in range(len(discX)): #Uses length instead of values to support multiple disks at same position 
+    
+    # Get rects for collision
+    botRect = pygame.Rect((botX,botY),(64,64))
+    for i in range(len(discX)): # Check collision
+        try:
+            currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
+            if currentDiscRect.colliderect(botRect) and botHeldDisks<3: 
+                discX.pop(i)
+                discY.pop(i)
+                botHeldDisks +=1
+        except IndexError:
+            pass
+
+    for i in range(len(discX)): # Uses length instead of values to support multiple disks at same position 
         discXI = discX[i]
         discYI = discY[i]
         screen.blit(scaledDisc,((discXI*zoomScale/100)+(width/2+panOffsetX),(discYI*zoomScale/100)+(height/2+panOffsetY)))
@@ -494,7 +510,7 @@ while 1: # Main game loop
                 totalSecondsRemaining = matchTime - math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
             else:
                 timerRunning = False
-        else:
+        elif timerMode == "disabled":
             totalSecondsRemaining = math.floor((pygame.time.get_ticks()-timerStart_ticks)/1000)
 
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
