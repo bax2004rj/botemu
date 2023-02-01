@@ -86,6 +86,7 @@ moveLeftSide = 0
 moveRightSide = 0
 moveLeft = 0
 moveRight = 0
+intake = False
 
 discX = [100,200,300,400,500,600,700,460,356,290,155]
 discY = [100,200,300,400,500,600,700,565,486,411,285]
@@ -192,6 +193,10 @@ def recordBotKeystrokes(events,fps):
             moveRightSide = 0
         elif "right_side_down_up" in events:
             moveRightSide = 0
+        elif "run_Intake" in events:
+            intake = True
+        elif "stop_intake" in events:
+            intake = False
 
 def displayPerformanceStats(screen,clock,win,events):
     global fpsSpeedScale
@@ -458,7 +463,7 @@ while 1: # Main game loop
     for i in range(len(discX)): # Check collision
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
-            if currentDiscRect.colliderect(botRect) and botHeldDisks<3: 
+            if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake: 
                 discX.pop(i)
                 discY.pop(i)
                 botHeldDisks +=1
