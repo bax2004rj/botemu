@@ -90,7 +90,9 @@ intake = False
 
 discX = [100,200,300,400,500,600,700,460,356,290,155]
 discY = [100,200,300,400,500,600,700,565,486,411,285]
-
+targetX = []
+targetY = []
+targetI = []
 
 # Button definitions here
 # Menu bar
@@ -465,6 +467,15 @@ while 1: # Main game loop
     for i in range(len(discX)): # Check collision
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
+            if i in targetI:
+                if not targetX[i] == discX[i] and not targetY[i] == discY[i]:
+                    addX = targetX[i]/targetY[i]
+                    addY = targetY[i]/targetX[i]
+                    discX[i] += addX 
+                    discY[i] += addY
+                if targetX[i] == discX[i] and targetY[i] == discY[i]:
+                    targetX.pop(i)
+                    targetY.pop(i)
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
                 discX.pop(i)
                 discY.pop(i)
