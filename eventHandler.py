@@ -73,7 +73,6 @@ def get_events():
     global eventPos
     global scrollAmount
     global control
-
     events = []
     pygame.event.pump()
 
@@ -142,6 +141,8 @@ def get_events():
                 events.append(fieldZoomIn_down)
             if event.key == pygame.K_o:
                 events.append(fieldZoomOut_down)
+            if event.key == pygame.K_q:
+                events.append(run_intake)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_down)
@@ -176,6 +177,8 @@ def get_events():
                 events.append(fieldZoomIn_up)
             if event.key == pygame.K_o:
                 events.append(fieldZoomOut_up)
+            if event.key == pygame.K_q:
+                events.append(stop_intake)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_up)
@@ -187,6 +190,12 @@ def get_events():
 
         if event.type == pygame.USEREVENT + 2:
             events.append(user_event_2)
+        
+        if event.type == pygame.JOYBUTTONDOWN:
+            if control.get_button(5):
+                events.append(run_intake)
+            if event.type == pygame.JOYBUTTONUP:
+                events.append(stop_intake)
     try:   
         controllerHandler.controller.get_axisVal(control)
     except AttributeError:

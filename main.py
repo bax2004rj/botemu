@@ -168,6 +168,7 @@ def recordBotKeystrokes(events,fps):
     global moveRightSide
     global moveLeft
     global moveRight
+    global intake
     if controlMode == "tank":
         if "up_key_down" in events:
             moveLeftSide = -512/fps
@@ -193,7 +194,7 @@ def recordBotKeystrokes(events,fps):
             moveRightSide = 0
         elif "right_side_down_up" in events:
             moveRightSide = 0
-        elif "run_Intake" in events:
+        elif "run_intake" in events:
             intake = True
         elif "stop_intake" in events:
             intake = False
@@ -412,6 +413,7 @@ while 1: # Main game loop
         else:
             moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
             moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
+
     except Exception:
         recordBotKeystrokes(events,fpsSpeedScale)
 
@@ -463,11 +465,12 @@ while 1: # Main game loop
     for i in range(len(discX)): # Check collision
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
-            if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake: 
+            if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
                 discX.pop(i)
                 discY.pop(i)
                 botHeldDisks +=1
         except IndexError:
+            print("disk collision error")
             pass
 
     for i in range(len(discX)): # Uses length instead of values to support multiple disks at same position 

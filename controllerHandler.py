@@ -31,7 +31,7 @@ class controller():
             print("Controller joined")
         except pygame.error:
             print("No controller found")
-    def get_button(number,self):
+    def get_button(self,number):
         return self.joystick.get_button(number)
 
     def get_axisVal(self):
