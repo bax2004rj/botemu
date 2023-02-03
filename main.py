@@ -87,6 +87,8 @@ moveRightSide = 0
 moveLeft = 0
 moveRight = 0
 intake = False
+power = 0
+angle = 40
 
 discX = [100,200,300,400,500,600,700,460,356,290,155]
 discY = [100,200,300,400,500,600,700,565,486,411,285]
@@ -320,7 +322,18 @@ def renderTimer(screen,cursor_img_rect,events):
             driverSkillsButton.text = "  Skills: Driver"
             noTimerButton.text = "✅ Stopwatch"
             timerMode = "disable"
-        
+
+def fire(): # Emulate firing physics
+    if botHeldDisks>0:
+        range = ((power**2)*(math.sin(2*angle)))/9.81
+        botRadians = math.radians(botDir-180)
+        discX.append(botX)
+        discY.append(botY)
+        targetX.append(-(range/256) * math.sin(botRadians))
+        targetY.append(-(range/256) * math.cos(botRadians))
+        targetI.append(len(discX))
+
+
 
 while 1: # Main game loop
     # Get time, solve for FPS

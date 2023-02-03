@@ -194,8 +194,7 @@ def get_events():
         if event.type == pygame.JOYBUTTONDOWN:
             if control.get_button(5):
                 events.append(run_intake)
-            if event.type == pygame.JOYBUTTONUP:
-                events.append(stop_intake)
+
     try:   
         controllerHandler.controller.get_axisVal(control)
     except AttributeError:
