@@ -59,6 +59,9 @@ fieldZoomIn_down = "fieldZoomIn_down"
 fieldZoomIn_up = "fieldZoomIn_up"
 fieldZoomOut_down = "fieldZoomOut_down"
 fieldZoomOut_up = "fieldZoomOut_up"
+power_up = "powerUp"
+power_down = "powerDown"
+fire = "fire"
 
 control = controllerHandler.controller()
 
@@ -143,6 +146,8 @@ def get_events():
                 events.append(fieldZoomOut_down)
             if event.key == pygame.K_q:
                 events.append(run_intake)
+            if event.key == pygame.K_e:
+                events.append(power_up)
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_down)
@@ -179,6 +184,11 @@ def get_events():
                 events.append(fieldZoomOut_up)
             if event.key == pygame.K_q:
                 events.append(stop_intake)
+            if event.key == pygame.K_e:
+                events.append(power_down)
+            if event.key == pygame.K_TAB:
+                events.append(fire)
+            
 
             if event.key == pygame.K_ESCAPE:
                 events.append(esc_up)

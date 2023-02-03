@@ -231,6 +231,7 @@ def displayPositionStats(screen,clock,win,events):
     global botX
     global botY
     global botDir
+    global power
     if win.active:
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")
@@ -238,6 +239,7 @@ def displayPositionStats(screen,clock,win,events):
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
@@ -324,14 +326,22 @@ def renderTimer(screen,cursor_img_rect,events):
             timerMode = "disable"
 
 def fire(): # Emulate firing physics
+    global botHeldDisks
+    global discX
+    global discY
+    global targetX
+    global targetY
+    global targetI
+    global botHeldDisks
     if botHeldDisks>0:
-        range = ((power**2)*(math.sin(2*angle)))/9.81
+        powerRange = ((power**2)*(math.sin(2*angle)))/9.81
         botRadians = math.radians(botDir-180)
-        discX.append(botX)
-        discY.append(botY)
-        targetX.append(-(range/256) * math.sin(botRadians))
-        targetY.append(-(range/256) * math.cos(botRadians))
+        discX.append(int(botX))
+        discY.append(int(botY))
+        targetX.append(-(powerRange/256) * math.sin(botRadians))
+        targetY.append(-(powerRange/256) * math.cos(botRadians))
         targetI.append(len(discX))
+        botHeldDisks -=1
 
 
 
@@ -422,6 +432,14 @@ while 1: # Main game loop
             if timerMode == "disabled":
                 totalSecondsRemaining = -1
                 matchTime = 1
+    elif "powerUp" in events:
+        if not power >= 100:
+            power += .0125*fpsSpeedScale
+    elif "powerDown" in events:
+        if not power <= 0:
+            power -= .0125*fpsSpeedScale
+    elif "fire" in events:
+        fire()
     try:
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
@@ -477,7 +495,7 @@ while 1: # Main game loop
     
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    for i in range(len(discX)): # Check collision
+    for i in range(int(len(discX))): # Check collision
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
             if i in targetI:
