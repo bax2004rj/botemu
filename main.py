@@ -89,6 +89,7 @@ moveRight = 0
 intake = False
 power = 0
 angle = 40
+addPwr = False
 
 discX = [100,200,300,400,500,600,700,460,356,290,155]
 discY = [100,200,300,400,500,600,700,565,486,411,285]
@@ -433,10 +434,12 @@ while 1: # Main game loop
                 totalSecondsRemaining = -1
                 matchTime = 1
     elif "powerUp" in events:
-        if not power >= 100:
+        addPwr = True
+        if power <= 100:
             power += .0125*fpsSpeedScale
     elif "powerDown" in events:
-        if not power <= 0:
+        addPwr = False
+        if power >= 0:
             power -= .0125*fpsSpeedScale
     elif "fire" in events:
         fire()
@@ -446,10 +449,13 @@ while 1: # Main game loop
         else:
             moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
             moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
-
     except Exception:
         recordBotKeystrokes(events,fpsSpeedScale)
 
+    if power <= 100 and addPwr:
+        power += .05*fpsSpeedScale
+    elif power >= 0 and not addPwr:
+        power -= .025*fpsSpeedScale
     
     # Bot control simulation
     botDir += (moveLeftSide-moveRightSide)/256
@@ -500,8 +506,8 @@ while 1: # Main game loop
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
             if i in targetI:
                 if not targetX[i] == discX[i] and not targetY[i] == discY[i]:
-                    addX = targetX[i]/targetY[i]
-                    addY = targetY[i]/targetX[i]
+                    addX = targetY[i]/targetX[i]
+                    addY = targetX[i]/targetY[i]
                     discX[i] += addX 
                     discY[i] += addY
                 if targetX[i] == discX[i] and targetY[i] == discY[i]:
