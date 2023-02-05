@@ -209,7 +209,6 @@ def get_events():
         controllerHandler.controller.get_axisVal(control)
     except AttributeError:
         pass
-        print("Controller data unknown")
 
 
     return events

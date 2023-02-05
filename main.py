@@ -335,14 +335,15 @@ def fire(): # Emulate firing physics
     global targetI
     global botHeldDisks
     if botHeldDisks>0:
-        powerRange = ((power**2)*(math.sin(2*angle)))/9.81
+        powerRange = ((power**2)*(math.sin(2*angle)))/-9.81
         botRadians = math.radians(botDir-180)
         discX.append(int(botX))
         discY.append(int(botY))
-        targetX.append(-(powerRange/256) * math.sin(botRadians))
-        targetY.append(-(powerRange/256) * math.cos(botRadians))
+        targetX.append((powerRange/256) * math.sin(botRadians))
+        targetY.append((powerRange/256) * math.cos(botRadians))
         targetI.append(len(discX))
         botHeldDisks -=1
+        print(powerRange)
 
 
 
@@ -502,23 +503,23 @@ while 1: # Main game loop
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
     for i in range(int(len(discX))): # Check collision
+        if i in targetI:
+            if not targetX[i] == discX[i] and not targetY[i] == discY[i]:
+                addX = targetY[i]/targetX[i]
+                addY = targetX[i]/targetY[i]
+                discX[i] += addX 
+                discY[i] += addY
+            elif targetX[i] == discX[i] and targetY[i] == discY[i]:
+                targetX.pop(i)
+                targetY.pop(i)
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
-            if i in targetI:
-                if not targetX[i] == discX[i] and not targetY[i] == discY[i]:
-                    addX = targetY[i]/targetX[i]
-                    addY = targetX[i]/targetY[i]
-                    discX[i] += addX 
-                    discY[i] += addY
-                if targetX[i] == discX[i] and targetY[i] == discY[i]:
-                    targetX.pop(i)
-                    targetY.pop(i)
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
                 discX.pop(i)
                 discY.pop(i)
                 botHeldDisks +=1
         except IndexError:
-            print("disk collision error")
+            print("disk not in index")
             pass
 
     for i in range(len(discX)): # Uses length instead of values to support multiple disks at same position 
