@@ -339,11 +339,11 @@ def fire(): # Solve firing physics
         botRadians = math.radians(botDir-180)
         discX.append(int(botX))
         discY.append(int(botY))
-        targetX.append((powerRange/256) * math.sin(botRadians))
-        targetY.append((powerRange/256) * math.cos(botRadians))
+        targetX.append(botX+(powerRange/256) * math.sin(botRadians))
+        targetY.append(botY+(powerRange/256) * math.cos(botRadians))
         targetI.append(len(discX))
         botHeldDisks -=1
-        print(powerRange)
+        print("Range: %f,Target pos:(%d,%d)"%(powerRange,targetX[-1],targetY[-1]))
 
 
 
@@ -437,11 +437,11 @@ while 1: # Main game loop
     elif "powerUp" in events:
         addPwr = True
         if power <= 100:
-            power += .0125*fpsSpeedScale
+            power += .05*fpsSpeedScale
     elif "powerDown" in events:
         addPwr = False
         if power >= 0:
-            power -= .0125*fpsSpeedScale
+            power -= .05*fpsSpeedScale
     elif "fire" in events:
         fire()
     try:
@@ -499,27 +499,26 @@ while 1: # Main game loop
     screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
     screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
-    
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    for i in range(int(len(discX))): # Check collision
+    for i in range(len(discX)): # Check collision and draw, ses length instead of values to support multiple disks at same position 
         if i in targetI:
-            targetxi = targetI[i]
-            targetyi = targetI[i]
-            if not targetxi == discX[i] and not targetyi == discY[i]:
-                addX = targetyi/targetxi
-                addY = targetxi/targetyi
-                if targetxi < discX[i]:
-                    discX[i] += addX*10
-                if targetyi < discY[i]:    
-                    discY[i] += addY*10
-                if targetxi > discX[i]:
-                    discX[i] -= addX*10
-                if targetyi > discY[i]:    
-                    discY[i] -= addY*10
-            elif targetxi == discX[i] and targetyi == discY[i]:
+            targetxi = targetX[targetI.index(i)]
+            targetyi = targetY[targetI.index(i)]
+            addX = targetyi/targetxi
+            addY = targetxi/targetyi
+            if targetxi < discX[i]:
+                discX[i] += addX*10*fpsSpeedScale
+            if targetyi < discY[i]:    
+                discY[i] += addY*10*fpsSpeedScale
+            if targetxi > discX[i]:
+                discX[i] -= addX*10*fpsSpeedScale
+            if targetyi > discY[i]:    
+                discY[i] -= addY*10*fpsSpeedScale
+            if targetxi == discX[i] and targetyi == discY[i]:
                 targetX.pop(i)
                 targetY.pop(i)
+                targetI.pop(i)
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
@@ -529,7 +528,6 @@ while 1: # Main game loop
         except IndexError:
             print("disk not in index")
             pass
-
     for i in range(len(discX)): # Uses length instead of values to support multiple disks at same position 
         discXI = discX[i]
         discYI = discY[i]
