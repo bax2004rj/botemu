@@ -204,6 +204,15 @@ def get_events():
         if event.type == pygame.JOYBUTTONDOWN:
             if control.get_button(5):
                 events.append(run_intake)
+            if control.get_button(6):
+                events.append(power_up)
+            if control.get_button(7):
+                events.append(fire)
+        if event.type == pygame.JOYBUTTONUP:
+            if control.get_button(5):
+                events.append(stop_intake)
+            if control.get_button(6):
+                events.append(power_down)
 
     try:   
         controllerHandler.controller.get_axisVal(control)
