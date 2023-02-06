@@ -326,7 +326,7 @@ def renderTimer(screen,cursor_img_rect,events):
             noTimerButton.text = "✅ Stopwatch"
             timerMode = "disable"
 
-def fire(): # Emulate firing physics
+def fire(): # Solve firing physics
     global botHeldDisks
     global discX
     global discY
@@ -504,12 +504,20 @@ while 1: # Main game loop
     botRect = pygame.Rect((botX,botY),(64,64))
     for i in range(int(len(discX))): # Check collision
         if i in targetI:
-            if not targetX[i] == discX[i] and not targetY[i] == discY[i]:
-                addX = targetY[i]/targetX[i]
-                addY = targetX[i]/targetY[i]
-                discX[i] += addX 
-                discY[i] += addY
-            elif targetX[i] == discX[i] and targetY[i] == discY[i]:
+            targetxi = targetI[i]
+            targetyi = targetI[i]
+            if not targetxi == discX[i] and not targetyi == discY[i]:
+                addX = targetyi/targetxi
+                addY = targetxi/targetyi
+                if targetxi < discX[i]:
+                    discX[i] += addX*10
+                if targetyi < discY[i]:    
+                    discY[i] += addY*10
+                if targetxi > discX[i]:
+                    discX[i] -= addX*10
+                if targetyi > discY[i]:    
+                    discY[i] -= addY*10
+            elif targetxi == discX[i] and targetyi == discY[i]:
                 targetX.pop(i)
                 targetY.pop(i)
         try:

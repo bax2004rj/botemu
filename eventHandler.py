@@ -206,12 +206,12 @@ def get_events():
                 events.append(run_intake)
             if control.get_button(6):
                 events.append(power_up)
-            if control.get_button(7):
+            if control.get_button(9):
                 events.append(fire)
         if event.type == pygame.JOYBUTTONUP:
-            if control.get_button(5):
+            if not control.get_button(5):
                 events.append(stop_intake)
-            if control.get_button(6):
+            if not control.get_button(6):
                 events.append(power_down)
 
     try:   
