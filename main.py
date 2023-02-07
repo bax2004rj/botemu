@@ -101,23 +101,23 @@ targetYInv = []
 
 # Button definitions here
 # Menu bar
-fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True)
-editButton = uiHandler.Button(font_small,30,24,30,0,1,text="Edit",button_type="procedural",active=True)
-viewButton = uiHandler.Button(font_small,30,24,60,0,1,text="View",button_type="procedural",active=True)
-gameButton = uiHandler.Button(font_small,30,24,90,0,1,text="Game",button_type="procedural",active=True)
-aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="procedural",active=True)
-timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True)
-recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000")
+fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+editButton = uiHandler.Button(font_small,30,24,30,0,1,text="Edit",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+viewButton = uiHandler.Button(font_small,30,24,60,0,1,text="View",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+gameButton = uiHandler.Button(font_small,30,24,90,0,1,text="Game",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
+recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000",box_color="#1f1f1f")
 #View Menu options
-performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance")
-positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions")
-motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "✅ Motors")
+performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance",box_color="#1f1f1f",text_color="#ffffff")
+positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions",box_color="#1f1f1f",text_color="#ffffff")
+motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "✅ Motors",box_color="#1f1f1f",text_color="#ffffff")
 # Timer menu options
-compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp")
-autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton")
-driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skills: Driver")
-noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch")
-runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)")
+compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp",box_color="#1f1f1f",text_color="#ffffff")
+autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton",box_color="#1f1f1f",text_color="#ffffff")
+driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skills: Driver",box_color="#1f1f1f",text_color="#ffffff")
+noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
+runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)",box_color="#1f1f1f",text_color="#ffffff")
 
 fileOpen = False
 editOpen = False
@@ -475,7 +475,6 @@ while 1: # Main game loop
     botRadians = math.radians(botDir-180)
     botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
     botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
-
     # Update and calculate scores TODO: Calculate endgame scores
     bScore = blueHighGoalDisks*5+blueLowGoalDisks
     if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -497,7 +496,7 @@ while 1: # Main game loop
         rScore += 10
     
     # Draw playfield
-    screen.fill("#2f2f2f")
+    screen.fill("#0f0f0f")
     # Scale objects
     scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
     scaledDisc = pygame.transform.scale(fileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
@@ -582,13 +581,14 @@ while 1: # Main game loop
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
     uiHandler.draw_text(screen,(width/2+panOffsetX)+((botX+32)*zoomScale/100),(height/2+panOffsetY)+((botY+32)*zoomScale/100),font_default,"%d"%botHeldDisks,"#FFFFFF")
+    pygame.draw.rect(screen,(10,10,10),(550+(panOffsetX*zoomScale),750+(panOffsetX*zoomScale),32*zoomScale/100,16*zoomScale/100))
     # High goals
     screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
     screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
     uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
     uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
     # Draw top menu bar
-    pygame.draw.rect(screen,(128,128,128),(0,0,width,24))
+    pygame.draw.rect(screen,(32,32,32),(0,0,width,24))
     fileButton.active = True
     fileButton.update(screen,cursor_img_rect,events)
     editButton.active = True
@@ -666,8 +666,8 @@ while 1: # Main game loop
     else:
         addModeZero = "0"
 
-    uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#000000")
-    uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#000000")
+    uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#ffffff")
+    uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#ffffff")
     # Run window tasks
     displayPerformanceStats(screen,clock,performanceWin,events)
     displayPositionStats(screen,clock,posWin,events)
