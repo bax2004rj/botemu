@@ -96,6 +96,8 @@ discY = [100,200,300,400,500,600,700,565,486,411,285]
 targetX = []
 targetY = []
 targetI = []
+targetXInv = []
+targetYInv = []
 
 # Button definitions here
 # Menu bar
@@ -333,6 +335,8 @@ def fire(): # Solve firing physics
     global targetX
     global targetY
     global targetI
+    global targetXInv
+    global targetYInv
     global botHeldDisks
     if botHeldDisks>0:
         powerRange = ((power**2)*(math.sin(2*angle)))/-9.81
@@ -342,6 +346,14 @@ def fire(): # Solve firing physics
         targetX.append(botX+(powerRange/256) * math.sin(botRadians))
         targetY.append(botY+(powerRange/256) * math.cos(botRadians))
         targetI.append(len(discX))
+        if targetX[-1] > botX:
+            targetXInv.append(True)
+        elif targetX[-1] < botX:
+            targetXInv.append(False)
+        if targetY[-1] > botY:
+            targetYInv.append(True)
+        elif targetY[-1] < botY:
+            targetYInv.append(False)
         botHeldDisks -=1
         print("Range: %f,Target pos:(%d,%d)"%(powerRange,targetX[-1],targetY[-1]))
 
@@ -505,8 +517,10 @@ while 1: # Main game loop
         if i in targetI:
             targetxi = targetX[targetI.index(i)]
             targetyi = targetY[targetI.index(i)]
-            addX = targetyi/targetxi
-            addY = targetxi/targetyi
+            targetXInvV = targetXInv[targetI.index(i)]
+            targetYInvV = targetYInv[targetI.index(i)]
+            addX = targetxi/targetyi
+            addY = targetyi/targetxi
             if targetxi < discX[i]:
                 discX[i] += addX*10*fpsSpeedScale
             if targetyi < discY[i]:    
@@ -515,10 +529,45 @@ while 1: # Main game loop
                 discX[i] -= addX*10*fpsSpeedScale
             if targetyi > discY[i]:    
                 discY[i] -= addY*10*fpsSpeedScale
-            if targetxi == discX[i] and targetyi == discY[i]:
-                targetX.pop(i)
-                targetY.pop(i)
-                targetI.pop(i)
+            try:
+                if not targetXInvV and targetxi >= discX[i]:
+                    targetX.pop(targetI.index(i))
+                    targetY.pop(targetI.index(i))
+                    targetI.pop(targetI.index(i))
+                    targetXInv.pop(targetI.index(i))
+                    targetYInv.pop(targetI.index(i))
+                if targetXInvV and targetxi <= discX[i]:
+                    targetX.pop(targetI.index(i))
+                    targetY.pop(targetI.index(i))
+                    targetI.pop(targetI.index(i))
+                    targetXInv.pop(targetI.index(i))
+                    targetYInv.pop(targetI.index(i))
+                if not targetYInvV and targetyi >= discY[i]:
+                    targetX.pop(targetI.index(i))
+                    targetY.pop(targetI.index(i))
+                    targetI.pop(targetI.index(i))
+                    targetXInv.pop(targetI.index(i))
+                    targetYInv.pop(targetI.index(i))
+                if targetYInvV and targetyi <= discY[i]:
+                    targetX.pop(targetI.index(i))
+                    targetY.pop(targetI.index(i))
+                    targetI.pop(targetI.index(i))
+                    targetXInv.pop(targetI.index(i))
+                    targetYInv.pop(targetI.index(i))
+            except Exception:
+                try:
+                    targetX.pop(targetI.index(i))
+                    targetY.pop(targetI.index(i))
+                    targetI.pop(targetI.index(i))
+                    targetXInv.pop(targetI.index(i))
+                    targetYInv.pop(targetI.index(i))
+                except Exception:
+                    pass
+                print("Probably reached target")
+        try:
+            screen.blit(scaledDisc,((discX[i]*zoomScale/100)+(width/2+panOffsetX),(discY[i]*zoomScale/100)+(height/2+panOffsetY)))    
+        except Exception:
+            print("Blit error")
         try:
             currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
@@ -527,11 +576,7 @@ while 1: # Main game loop
                 botHeldDisks +=1
         except IndexError:
             print("disk not in index")
-            pass
-    for i in range(len(discX)): # Uses length instead of values to support multiple disks at same position 
-        discXI = discX[i]
-        discYI = discY[i]
-        screen.blit(scaledDisc,((discXI*zoomScale/100)+(width/2+panOffsetX),(discYI*zoomScale/100)+(height/2+panOffsetY)))
+            pass        
     # Draw bots before anything above it
     scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
     scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)

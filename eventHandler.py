@@ -134,9 +134,9 @@ def get_events():
                 events.append(right_side_down_down)
             if event.key == pygame.K_i:
                 events.append(fieldUp_down)
-            if event.key == pygame.K_l:
-                events.append(fieldRight_down)
             if event.key == pygame.K_j:
+                events.append(fieldRight_down)
+            if event.key == pygame.K_l:
                 events.append(fieldLeft_down)
             if event.key == pygame.K_k:
                 events.append(fieldDown_down)
@@ -172,9 +172,9 @@ def get_events():
                 events.append(right_side_down_up)
             if event.key == pygame.K_i:
                 events.append(fieldUp_up)
-            if event.key == pygame.K_l:
-                events.append(fieldRight_up)
             if event.key == pygame.K_j:
+                events.append(fieldRight_up)
+            if event.key == pygame.K_l:
                 events.append(fieldLeft_up)
             if event.key == pygame.K_k:
                 events.append(fieldDown_up)
