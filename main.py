@@ -244,6 +244,36 @@ def displayPositionStats(screen,clock,win,events):
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
 
+def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
+    global fpsSpeedScale
+    if win.active:
+        # Draw rectangles
+        lcolR = 255
+        lcolG = 0
+        revl = 0
+        rcolR = 255
+        rcolG = 0
+        revr = 0
+        try:
+            lcolR = abs(lspeed)/2
+            lcolG = abs(lspeed)/2
+            revl = 0
+            if lspeed < 0:
+                revl = 255
+            rcolR = abs(lspeed)/2
+            rcolG = abs(lspeed)/2
+            revr = 0
+            if rspeed > 0:
+                revr = 255
+        except ZeroDivisionError:
+            lcolR = 255
+            lcolG = 0
+            revl = 0
+        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+30,32,48))
+        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
+        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
+        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
+
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
     if viewOpen:
@@ -711,13 +741,14 @@ while 1: # Main game loop
 
     uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#ffffff")
     uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#ffffff")
-    # Run window tasks
-    displayPerformanceStats(screen,clock,performanceWin,events)
-    displayPositionStats(screen,clock,posWin,events)
     # Draw windows
     posWin.update(screen,cursor_img_rect,events)
     performanceWin.update(screen,cursor_img_rect,events)
     motorWin.update(screen,cursor_img_rect,events)
+    # Run window tasks
+    displayPerformanceStats(screen,clock,performanceWin,events)
+    displayPositionStats(screen,clock,posWin,events)
+    displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide,power)
     # Render last so huds and displays can show overlays
     if moveFieldUp:
         panOffsetY += moveRate*zoomScale/100
