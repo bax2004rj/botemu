@@ -111,7 +111,7 @@ recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",bu
 #View Menu options
 performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance",box_color="#1f1f1f",text_color="#ffffff")
 positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions",box_color="#1f1f1f",text_color="#ffffff")
-motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "✅ Motors",box_color="#1f1f1f",text_color="#ffffff")
+motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "  Motors",box_color="#1f1f1f",text_color="#ffffff")
 # Timer menu options
 compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp",box_color="#1f1f1f",text_color="#ffffff")
 autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton",box_color="#1f1f1f",text_color="#ffffff")
@@ -130,9 +130,14 @@ recOpen = False
 # Window definitions here
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
-motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",True)
+motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
 
-#Variables
+# Color roller physics rect
+colorRoller1Rect = pygame.Rect(554,784,48,16)
+colorRoller2Rect = pygame.Rect(200,0,48,16)
+colorRoller3Rect = pygame.Rect(0,154,16,48)
+colorRoller4Rect = pygame.Rect(782,600,16,48)
+# Variables
 get_ticks_last_frame = 0
 # Game scores: High goal
 botHeldDisks = 0
@@ -161,6 +166,7 @@ timerRunning = False
 totalSecondsRemaining = 180
 
 mainTimer = pygame.time.set_timer(pygame.USEREVENT,1000)
+colorRollerTimer = pygame.time.set_timer(pygame.USEREVENT+2,125)
 timerStart_ticks = 0
 
 
@@ -542,7 +548,7 @@ while 1: # Main game loop
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    for i in range(len(discX)): # Check collision and draw, ses length instead of values to support multiple disks at same position 
+    for i in range(len(discX)): # Check collision and draw, sees length instead of values to support multiple disks at same position 
         if i in targetI:
             targetxi = targetX[targetI.index(i)]
             targetyi = targetY[targetI.index(i)]
@@ -643,7 +649,7 @@ while 1: # Main game loop
     if ColorRoller3Custody == 2:
         pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
     if ColorRoller3Custody == 3:
-        pygame.draw.rect(screen,(255,0,0),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+        pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
     pygame.draw.rect(screen,(64,64,64),((782*zoomScale/100)+(width/2 + panOffsetX),(600*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
     if ColorRoller4Custody == 0:
         pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
@@ -655,6 +661,46 @@ while 1: # Main game loop
         pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
     if ColorRoller4Custody == 3:
         pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+    if colorRoller1Rect.colliderect(botRect) and intake and "user_event_2" in events:
+        print("Color roller 1 changing")
+        if ColorRoller1Custody == 0:
+            ColorRoller1Custody = 2
+        elif ColorRoller1Custody == 1:
+            ColorRoller1Custody = 3
+        elif ColorRoller1Custody == 2:
+            ColorRoller1Custody = 1
+        elif ColorRoller1Custody == 3:
+            ColorRoller1Custody = 0
+    if colorRoller2Rect.colliderect(botRect) and intake and "user_event_2" in events:
+        print("Color roller 2 changing")
+        if ColorRoller2Custody == 0:
+            ColorRoller2Custody = 2
+        elif ColorRoller2Custody == 1:
+            ColorRoller2Custody = 3
+        elif ColorRoller2Custody == 2:
+            ColorRoller2Custody = 1
+        elif ColorRoller2Custody == 3:
+            ColorRoller2Custody = 0
+    if colorRoller3Rect.colliderect(botRect) and intake and "user_event_2" in events:
+        print("Color roller 2 changing")
+        if ColorRoller3Custody == 0:
+            ColorRoller3Custody = 2
+        elif ColorRoller3Custody == 1:
+            ColorRoller3Custody = 3
+        elif ColorRoller3Custody == 2:
+            ColorRoller3Custody = 1
+        elif ColorRoller3Custody == 3:
+            ColorRoller3Custody = 0
+    if colorRoller4Rect.colliderect(botRect) and intake and "user_event_2" in events:
+        print("Color roller 2 changing")
+        if ColorRoller4Custody == 0:
+            ColorRoller4Custody = 2
+        elif ColorRoller4Custody == 1:
+            ColorRoller4Custody = 3
+        elif ColorRoller4Custody == 2:
+            ColorRoller4Custody = 1
+        elif ColorRoller4Custody == 3:
+            ColorRoller4Custody = 0
     # High goals
     screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
     screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
@@ -696,7 +742,7 @@ while 1: # Main game loop
 
     uiHandler.draw_text(screen,width/2-20,10,font_small,str(bScore),"#0000ff")
     uiHandler.draw_text(screen,width/2,10,font_small,"|","#870087")
-    uiHandler.draw_text(screen,width/2+20,10,font_small,str(bScore),"#ff0000")
+    uiHandler.draw_text(screen,width/2+20,10,font_small,str(rScore),"#ff0000")
     minutesRemaining = math.floor(totalSecondsRemaining/60)
     secondsRemaining = totalSecondsRemaining-(minutesRemaining*60)
 
