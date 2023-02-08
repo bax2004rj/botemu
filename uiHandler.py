@@ -56,7 +56,7 @@ class window:
         self.content.set_alpha(50)
         self.content.fill("#1c1c1c")
         if closable:
-            self.closeButton = Button(fileHandler.font_small,24,24,0,0,0,text_color="#ff0000",hover_text_color="#ffffff",hover_box_color="#ff0000",text="X")
+            self.closeButton = Button(fileHandler.font_small,24,24,0,0,0,text_color="#ffffff",hover_text_color="#ffffff",hover_box_color="#ff0000",box_color="#870000",selected_box_color="#ff8787",selected_text_color="#ffffff",text="X")
         self.panStartX = 0
         self.panStartY = 0
         self.dragging = False
