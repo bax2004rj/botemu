@@ -6,6 +6,7 @@ import pygame
 import eventHandler
 import fileHandler
 import uiHandler
+import physicsHandler
 
 #Other
 import psutil
@@ -137,6 +138,8 @@ colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
 colorRoller3Rect = pygame.Rect(0,154,16,48)
 colorRoller4Rect = pygame.Rect(782,600,16,48)
+blueLowGoalHitbox = pygame.Rect(532,268,268,268)
+redLowGoalHitbox = pygame.Rect(0,800,268,268)
 # Variables
 get_ticks_last_frame = 0
 # Game scores: High goal
@@ -364,37 +367,6 @@ def renderTimer(screen,cursor_img_rect,events):
             noTimerButton.text = "✅ Stopwatch"
             timerMode = "disable"
 
-def fire(): # Solve firing physics
-    global botHeldDisks
-    global discX
-    global discY
-    global targetX
-    global targetY
-    global targetI
-    global targetXInv
-    global targetYInv
-    global botHeldDisks
-    if botHeldDisks>0:
-        powerRange = ((power**2)*(math.sin(2*angle)))/-9.81
-        botRadians = math.radians(botDir-180)
-        discX.append(int(botX))
-        discY.append(int(botY))
-        targetX.append(botX+(powerRange/256) * math.sin(botRadians))
-        targetY.append(botY+(powerRange/256) * math.cos(botRadians))
-        targetI.append(len(discX))
-        if targetX[-1] > botX:
-            targetXInv.append(True)
-        elif targetX[-1] < botX:
-            targetXInv.append(False)
-        if targetY[-1] > botY:
-            targetYInv.append(True)
-        elif targetY[-1] < botY:
-            targetYInv.append(False)
-        botHeldDisks -=1
-        print("Range: %f,Target pos:(%d,%d)"%(powerRange,targetX[-1],targetY[-1]))
-
-
-
 while 1: # Main game loop
     # Get time, solve for FPS
     ticks = pygame.time.get_ticks()
@@ -491,7 +463,8 @@ while 1: # Main game loop
         if power >= 0:
             power -= .05*fpsSpeedScale
     elif "fire" in events:
-        fire()
+        physicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
+        botHeldDisks -=1
     try:
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
