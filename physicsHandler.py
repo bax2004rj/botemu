@@ -24,7 +24,7 @@ def fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,
             targetYInv.append(False)
         print("Range: %f,Target pos:(%d,%d)"%(powerRange,targetX[-1],targetY[-1]))
 
-world = world(gravity=(0, -10), doSleep=True)
+world = world(gravity=(0, 0), doSleep=True)
 
 ground_body = world.CreateStaticBody(
     position=(0, 0),
@@ -59,6 +59,7 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
         for i in newdiscI:
             discX[newdiscI.index(i)] = newdiscX[i]
             discY[newdiscI.index(i)] = newdiscY[i]
+            world.DestroyBody(body[i])
     except IndexError:
         pass
     return discX,discY
