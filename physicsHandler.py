@@ -4,6 +4,9 @@ import Box2D
 from Box2D.b2 import (world, polygonShape, circleShape, staticBody, dynamicBody)
 
 ppm = 224.650948589
+newdiscX = []
+newdiscY = []
+newdiscI = []
 
 def fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle): # Solve firing physics
     if botHeldDisks>0:
@@ -33,19 +36,28 @@ ground_body = world.CreateStaticBody(
 
 def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bodies for box2d
     global world
-    newdiscX = []
-    newdiscY = [] 
-    newdiscI = []
+    global newdiscI
+    global newdiscX
+    global newdiscY
     body = []
     circle = []
-    bot = world.CreateDynamicBody(position = (botx/ppm,boty/ppm))
+    bot = world.CreateDynamicBody(position = (botx/ppm,boty/ppm),angle = botdir)
     botPhysicRect = bot.CreatePolygonFixture(box = (0.5,0.5))
     for i in range(len(discX)):# Eliminate any discs currently being animated
-        if not i in targetI:
+        if not i in targetI and i not in newdiscI:
             newdiscX.append(discX[i])
             newdiscY.append(discY[i])
             newdiscI.append(i)
-    for i in range(len(newdiscX)): # Give it positions
+        elif i in newdiscI:
+            di = newdiscI.index(i)
+            newdiscX[di]=discX[i]
+            newdiscY[di]=discY[i]
+        else: # Delete if criterion missed
+            newdiscX.pop(i)
+            newdiscY.pop(i)
+            newdiscI.pop(i)
+            world.DestroyBody(body[i])
+    for i in range(len(newdiscX)): # Check if object already there
         posX = newdiscX[i]/ppm
         posY = newdiscY[i]/ppm
         body.append(world.CreateDynamicBody(position=(posX,posY)))
@@ -57,9 +69,8 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
     # Steal those positions back!
     try:
         for i in newdiscI:
-            discX[newdiscI.index(i)] = newdiscX[i]
-            discY[newdiscI.index(i)] = newdiscY[i]
-            world.DestroyBody(body[i])
+            discX[newdiscI.index(i)]=200
+            discY[newdiscI.index(i)]=200
     except IndexError:
         pass
     return discX,discY
