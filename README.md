@@ -5,9 +5,10 @@ This fulfills the needs for a simulator for Vexcode Pro. It will eventually be u
 ## Installation
 Future versions will include installer with autoupdate system
 ### Prerequisites
-- Python 3.10+
-- Pygame & SDL2
-- box2d (install box2d-kengz if errors occur)
+- `Python 3.10+`
+- `Pygame` & `SDL2`
+- `box2d` (install `box2d-kengz` if errors occur)
+- `psutil`
 ## Basic tutorial
 ### Bot motion
 Driving is currently done using tank drive (one stick y-axis per side).
