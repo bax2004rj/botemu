@@ -7,7 +7,7 @@ Future versions will include installer with autoupdate system
 ### Prerequisites
 - `Python 3.10+`
 - `Pygame` & `SDL2`
-- `box2d` (install `box2d-kengz` if errors occur)
+- `box2d` & `swig`(install `box2d-kengz` as well if errors occur)
 - `psutil`
 ## Basic tutorial
 ### Bot motion
