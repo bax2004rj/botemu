@@ -484,6 +484,10 @@ while 1: # Main game loop
     botRadians = math.radians(botDir-180)
     botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
     botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
+    if botDir>360:
+        botDir = 0
+    elif botDir<0:
+        botDir = 360
     # Update and calculate scores TODO: Calculate endgame scores
     bScore = blueHighGoalDisks*5+blueLowGoalDisks
     if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -784,6 +788,13 @@ while 1: # Main game loop
     if zoomOut and zoomScale>10:
         zoomScale -= 1
         uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+
+    # Draw scale
+    pygame.draw.rect(screen,"#ffffff",(32,height-32,physicsHandler.ppm*(zoomScale/100),5))
+    pygame.draw.rect(screen,"#000000",(32,height-32,physicsHandler.ppm*(zoomScale/200),5))
+    uiHandler.draw_text(screen,20,height-20,font_small,"m","#828282")
+    uiHandler.draw_text(screen,32,height-20,font_small,"0","#828282")
+    uiHandler.draw_text(screen,32+(physicsHandler.ppm*zoomScale/100),height-20,font_small,"1","#828282")
 
     screen.blit(cursors[0], cursor_img_rect)
     pygame.display.flip()
