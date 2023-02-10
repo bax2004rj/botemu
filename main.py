@@ -521,7 +521,7 @@ while 1: # Main game loop
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    discX,discY = physicsHandler.updatePhysics(discX,discY,targetI,botX,botY,botDir,fps) # 
+    discX,discY,[botX,botY] = physicsHandler.updatePhysics(discX,discY,targetI,botX,botY,botDir,fps) # 
     for i in range(len(discX)): # Check collision and draw, sees length instead of values to support multiple disks at same position 
         if i in targetI:
             targetxi = targetX[targetI.index(i)]
