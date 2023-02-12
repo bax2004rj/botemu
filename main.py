@@ -286,7 +286,7 @@ def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
     if viewOpen:
-        pygame.draw.rect(screen,(16,16,16),(120,24,100,200))
+        pygame.draw.rect(screen,(16,16,16),(60,24,100,200))
         performanceButton.active = True
         performanceButton.update(screen,cursor_img_rect,events)
         positionsButton.active = True
