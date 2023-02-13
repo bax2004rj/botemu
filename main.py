@@ -463,8 +463,9 @@ while 1: # Main game loop
         if power >= 0:
             power -= .05*fpsSpeedScale
     elif "fire" in events:
-        physicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
-        botHeldDisks -=1
+        if botHeldDisks > 0:
+            physicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
+            botHeldDisks -=1
     try:
         if eventHandler.control.joy_name == "":
             recordBotKeystrokes(events)
@@ -534,14 +535,17 @@ while 1: # Main game loop
             targetYInvV = targetYInv[targetI.index(i)]
             addX = targetxi/targetyi
             addY = targetyi/targetxi
-            if targetxi < discX[i]:
-                discX[i] += addX*10*fpsSpeedScale
-            if targetyi < discY[i]:    
-                discY[i] += addY*10*fpsSpeedScale
-            if targetxi > discX[i]:
-                discX[i] -= addX*10*fpsSpeedScale
-            if targetyi > discY[i]:    
-                discY[i] -= addY*10*fpsSpeedScale
+            try:
+                if targetxi < discX[i]:
+                    discX[i] += addX*10*fpsSpeedScale
+                if targetyi < discY[i]:    
+                    discY[i] += addY*10*fpsSpeedScale
+                if targetxi > discX[i]:
+                    discX[i] -= addX*10*fpsSpeedScale
+                if targetyi > discY[i]:    
+                    discY[i] -= addY*10*fpsSpeedScale
+            except IndexError:
+                print("disk animation error")
             try:
                 if not targetXInvV and targetxi >= discX[i]:
                     targetX.pop(targetI.index(i))
@@ -795,7 +799,11 @@ while 1: # Main game loop
     uiHandler.draw_text(screen,20,height-20,font_small,"m","#828282")
     uiHandler.draw_text(screen,32,height-20,font_small,"0","#828282")
     uiHandler.draw_text(screen,32+(physicsHandler.ppm*zoomScale/100),height-20,font_small,"1","#828282")
-
+    uiHandler.draw_text(screen,20,height-40,font_small,"ft","#828282")
+    uiHandler.draw_text(screen,32,height-40,font_small,"0","#828282")
+    uiHandler.draw_text(screen,32+((physicsHandler.ppm/3.281)*(zoomScale/100)),height-40,font_small,"1","#828282")
+    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*2)*(zoomScale/100)),height-40,font_small,"2","#828282")
+    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*3)*(zoomScale/100)),height-40,font_small,"3","#828282")
     screen.blit(cursors[0], cursor_img_rect)
     pygame.display.flip()
     clock.tick(framelimit)
