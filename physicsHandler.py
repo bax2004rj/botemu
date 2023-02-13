@@ -3,7 +3,7 @@ import math
 import Box2D
 from Box2D.b2 import (world, polygonShape, circleShape, staticBody, dynamicBody)
 
-ppm = 224.650948589
+ppm = 221.22366237
 newdiscX = []
 newdiscY = []
 newdiscI = []
@@ -31,40 +31,40 @@ world = world(gravity=(0, 0), doSleep=True)
 # Walls
 top_wall = world.CreateStaticBody(
     position=(0, 0),
-    shapes=polygonShape(box=(3.5687, 0.032258)),
+    shapes=polygonShape(box=(3.5687, -0.032258)),
 )
 btm_wall = world.CreateStaticBody(
-    position=(0, -3.5687),
-    shapes=polygonShape(box=(3.5687, 0.032258)),
+    position=(0, 3.5687),
+    shapes=polygonShape(box=(3.5687, -0.032258)),
 )
 lef_wall = world.CreateStaticBody(
     position=(0, 0),
-    shapes=polygonShape(box=(0.032258,3.5687)),
+    shapes=polygonShape(box=(0.032258,-3.5687)),
 )
 rig_wall = world.CreateStaticBody(
     position=(3.5687, 0),
-    shapes=polygonShape(box=(0.032258, 3.5687)),
+    shapes=polygonShape(box=(0.032258, -3.5687)),
 )
 
 # Low goal barriers
 blg_x = world.CreateStaticBody(
     position=(2.35204, -0.441706),
-    shapes=polygonShape(box=(3.5687, 0.032258)),
+    shapes=polygonShape(box=(0.657606,-0.0508)),
 )
 blg_y = world.CreateStaticBody(
     position=(2.35204, -1),
-    shapes=polygonShape(box=(3.5687, 0.032258)),
+    shapes=polygonShape(box=(0.0508, -0.657606)),
 )
 rlg_x = world.CreateStaticBody(
     position=(1.214374, -2.35204),
-    shapes=polygonShape(box=(0.657606,0.0508)),
+    shapes=polygonShape(box=(0.657606,-0.0508)),
 )
 rlg_y = world.CreateStaticBody(
     position=(1.82118, -2.35204),
-    shapes=polygonShape(box=(0.0508, 0.657606)),
+    shapes=polygonShape(box=(0.0508, -0.657606)),
 )
 
-bot = world.CreateDynamicBody(position = (465/ppm,730/ppm),angle = 0)
+bot = world.CreateDynamicBody(position = (465/ppm,-730/ppm),angle = 0)
 botPhysicRect = bot.CreatePolygonFixture(box = (0.4572,0.4572))
 def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bodies for box2d
     global world
@@ -74,7 +74,7 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
     body = []
     circle = []
     global bot
-    bot.position = [botx/ppm,boty/ppm]
+    bot.position = [botx/ppm,-boty/ppm]
     bot.angle = botdir
     # for i in range(len(discX)):# Eliminate any discs currently being animated
     #     if not i in targetI and i not in newdiscI:
@@ -107,5 +107,6 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
     # except IndexError:
     #     pass
     newBotPos = bot.position*ppm
+    newBotPos[1] = -newBotPos[1]
     return discX,discY,newBotPos
 
