@@ -1,5 +1,5 @@
 import math
-
+import pygame
 import Box2D
 from Box2D.b2 import (world, polygonShape, circleShape, staticBody, dynamicBody)
 
@@ -34,7 +34,7 @@ top_wall = world.CreateStaticBody(
     shapes=polygonShape(box=(3.5687, -0.032258)),
 )
 btm_wall = world.CreateStaticBody(
-    position=(0, 3.5687),
+    position=(0, -3.5687),
     shapes=polygonShape(box=(3.5687, -0.032258)),
 )
 lef_wall = world.CreateStaticBody(
@@ -49,24 +49,44 @@ rig_wall = world.CreateStaticBody(
 # Low goal barriers
 blg_x = world.CreateStaticBody(
     position=(2.35204, -0.441706),
-    shapes=polygonShape(box=(0.657606,-0.0508)),
+    shapes=polygonShape(box=(0.657606,-0.328803)),
 )
 blg_y = world.CreateStaticBody(
     position=(2.35204, -1),
-    shapes=polygonShape(box=(0.0508, -0.657606)),
+    shapes=polygonShape(box=(0.0508, -0.328803)),
 )
 rlg_x = world.CreateStaticBody(
     position=(1.214374, -2.35204),
-    shapes=polygonShape(box=(0.657606,-0.0508)),
+    shapes=polygonShape(box=(0.328803,-0.0508)),
 )
 rlg_y = world.CreateStaticBody(
     position=(1.82118, -2.35204),
-    shapes=polygonShape(box=(0.0508, -0.657606)),
+    shapes=polygonShape(box=(0.0508, -0.328803)),
 )
 
 bot = world.CreateDynamicBody(position = (465/ppm,-730/ppm),angle = 0)
-botPhysicRect = bot.CreatePolygonFixture(box = (0.4572,0.4572))
-def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bodies for box2d
+botPhysicRect = bot.CreatePolygonFixture(box = (0.125,0.125))
+
+# Temporary hitbox rendering system (likely removing when physics works for once), based on kne's demos
+colors = {
+    staticBody: (0, 255, 255, 127),
+    dynamicBody: (127, 0, 255, 127),
+}
+def my_draw_polygon(polygon, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffsetY,zoom,screen,PPM = 221.22366237):
+    vertices = [(body.transform * v) * PPM for v in polygon.vertices]
+    vertices = [(v[0]+(panOffsetx+(width/2))*zoom/100, SCREEN_HEIGHT/2*(zoom/100)+panOffsetY - v[1]) for v in vertices]
+    pygame.draw.polygon(screen, colors[body.type], vertices)
+polygonShape.draw = my_draw_polygon
+def my_draw_circle(circle, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffsetY,zoom,screen,PPM = 221.22366237):
+    position = body.transform * circle.pos * PPM
+    position = (position[0], SCREEN_HEIGHT - position[1])
+    pygame.draw.circle(screen, colors[body.type], [int(
+        x) for x in position], int(circle.radius * PPM))
+    # Note: Python 3.x will enforce that pygame get the integers it requests,
+    #       and it will not convert from float.
+circleShape.draw = my_draw_circle
+
+def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,panOffsetx,panOffsetY,zoom): # Create dynamic bodies for box2d
     global world
     global newdiscI
     global newdiscX
@@ -75,7 +95,7 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
     circle = []
     global bot
     bot.position = [botx/ppm,-boty/ppm]
-    bot.angle = botdir
+    # bot.angle = botdir
     # for i in range(len(discX)):# Eliminate any discs currently being animated
     #     if not i in targetI and i not in newdiscI:
     #         newdiscX.append(discX[i])
@@ -99,6 +119,9 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
         world.Step(1/fps,10,10) # Give it time
     except ZeroDivisionError:
         world.Step(1,10,10)
+    for body in world.bodies:
+        for fixture in body.fixtures:
+            fixture.shape.draw(body, fixture,height,width,panOffsetx,panOffsetY,zoom,screen)
     # Steal those positions back!
     # try:
     #     for i in newdiscI:
@@ -109,4 +132,5 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps): # Create dynamic bo
     newBotPos = bot.position*ppm
     newBotPos[1] = -newBotPos[1]
     return discX,discY,newBotPos
+
 
