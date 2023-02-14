@@ -48,19 +48,19 @@ rig_wall = world.CreateStaticBody(
 
 # Low goal barriers
 blg_x = world.CreateStaticBody(
-    position=(2.35204, -0.441706),
-    shapes=polygonShape(box=(0.657606,-0.328803)),
+    position=(2.65204, -1.25),
+    shapes=polygonShape(box=(0.328803,-0.0508)),
 )
 blg_y = world.CreateStaticBody(
-    position=(2.35204, -1),
+    position=(2.37204, -.95),
     shapes=polygonShape(box=(0.0508, -0.328803)),
 )
 rlg_x = world.CreateStaticBody(
-    position=(1.214374, -2.35204),
+    position=(0.9, -2.37204),
     shapes=polygonShape(box=(0.328803,-0.0508)),
 )
 rlg_y = world.CreateStaticBody(
-    position=(1.82118, -2.35204),
+    position=(1.214374, -2.75204),
     shapes=polygonShape(box=(0.0508, -0.328803)),
 )
 
