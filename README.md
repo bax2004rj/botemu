@@ -9,6 +9,11 @@ Future versions will include installer with autoupdate system
 - `Pygame` & `SDL2`
 - `box2d` & `swig`(install `box2d-kengz` as well if errors occur)
 - `psutil`
+### Installation
+Run `main.py`
+Or if you are more into command lines (Linux/Mac):
+`$ cd {insert where it cloned to here}/botemu
+$ /bin/python3 main.py` 
 ## Basic tutorial
 ### Bot motion
 Driving is currently done using tank drive (one stick y-axis per side).
