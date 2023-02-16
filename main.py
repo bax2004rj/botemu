@@ -526,7 +526,7 @@ while 1: # Main game loop
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,True) # 
+    discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,False) # 
     botX -= 32
     botY -= 32
     botDir = math.degrees(botRadians)+180
@@ -799,14 +799,14 @@ while 1: # Main game loop
     # Draw scale
     pygame.draw.rect(screen,"#ffffff",(32,height-32,physicsHandler.ppm*(zoomScale/100),5))
     pygame.draw.rect(screen,"#000000",(32,height-32,physicsHandler.ppm*(zoomScale/200),5))
-    uiHandler.draw_text(screen,20,height-20,font_small,"m","#828282")
-    uiHandler.draw_text(screen,32,height-20,font_small,"0","#828282")
-    uiHandler.draw_text(screen,32+(physicsHandler.ppm*zoomScale/100),height-20,font_small,"1","#828282")
-    uiHandler.draw_text(screen,20,height-40,font_small,"ft","#828282")
-    uiHandler.draw_text(screen,32,height-40,font_small,"0","#828282")
-    uiHandler.draw_text(screen,32+((physicsHandler.ppm/3.281)*(zoomScale/100)),height-40,font_small,"1","#828282")
-    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*2)*(zoomScale/100)),height-40,font_small,"2","#828282")
-    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*3)*(zoomScale/100)),height-40,font_small,"3","#828282")
+    uiHandler.draw_text(screen,20,height-20,font_small,"m","#ffffff")
+    uiHandler.draw_text(screen,32,height-20,font_small,"0","#ffffff")
+    uiHandler.draw_text(screen,32+(physicsHandler.ppm*zoomScale/100),height-20,font_small,"1","#ffffff")
+    uiHandler.draw_text(screen,20,height-40,font_small,"ft","#ffffff")
+    uiHandler.draw_text(screen,32,height-40,font_small,"0","#ffffff")
+    uiHandler.draw_text(screen,32+((physicsHandler.ppm/3.281)*(zoomScale/100)),height-40,font_small,"1","#ffffff")
+    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*2)*(zoomScale/100)),height-40,font_small,"2","#ffffff")
+    uiHandler.draw_text(screen,32+(((physicsHandler.ppm/3.281)*3)*(zoomScale/100)),height-40,font_small,"3","#ffffff")
     screen.blit(cursors[0], cursor_img_rect)
     pygame.display.flip()
     clock.tick(framelimit)
