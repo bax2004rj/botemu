@@ -65,7 +65,7 @@ rlg_y = world.CreateStaticBody(
 )
 
 bot = world.CreateDynamicBody(position = (465/ppm,-730/ppm),angle = 0)
-botPhysicRect = bot.CreatePolygonFixture(box = (0.125,0.125))
+botPhysicRect = bot.CreatePolygonFixture(box = (0.125,0.125),density=1, friction=.3)
 
 # Temporary hitbox rendering system (likely removing when physics works for once), based on kne's demos
 colors = {
@@ -94,8 +94,8 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,p
     body = []
     circle = []
     global bot
+    bot.angle = botdir
     bot.position = [botx/ppm,-boty/ppm]
-    # bot.angle = botdir
     # for i in range(len(discX)):# Eliminate any discs currently being animated
     #     if not i in targetI and i not in newdiscI:
     #         newdiscX.append(discX[i])
@@ -122,7 +122,7 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,p
     if debug:
         for body in world.bodies:
             for fixture in body.fixtures:
-                fixture.shape.draw(body, fixture,height,width,panOffsetx,panOffsetY,zoom,screen)
+                fixture.shape.draw(body,fixture,height,width,panOffsetx,panOffsetY,zoom,screen)
     # Steal those positions back!
     # try:
     #     for i in newdiscI:
@@ -132,6 +132,7 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,p
     #     pass
     newBotPos = bot.position*ppm
     newBotPos[1] = -newBotPos[1]
-    return discX,discY,newBotPos
+    newBotRad = bot.angle
+    return discX,discY,newBotPos,newBotRad
 
 
