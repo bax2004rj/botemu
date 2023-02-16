@@ -86,7 +86,7 @@ def my_draw_circle(circle, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffse
     #       and it will not convert from float.
 circleShape.draw = my_draw_circle
 
-def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,panOffsetx,panOffsetY,zoom): # Create dynamic bodies for box2d
+def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,panOffsetx,panOffsetY,zoom,debug = False): # Create dynamic bodies for box2d
     global world
     global newdiscI
     global newdiscX
@@ -119,9 +119,10 @@ def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,p
         world.Step(1/fps,10,10) # Give it time
     except ZeroDivisionError:
         world.Step(1,10,10)
-    for body in world.bodies:
-        for fixture in body.fixtures:
-            fixture.shape.draw(body, fixture,height,width,panOffsetx,panOffsetY,zoom,screen)
+    if debug:
+        for body in world.bodies:
+            for fixture in body.fixtures:
+                fixture.shape.draw(body, fixture,height,width,panOffsetx,panOffsetY,zoom,screen)
     # Steal those positions back!
     # try:
     #     for i in newdiscI:
