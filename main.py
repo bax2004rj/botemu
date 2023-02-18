@@ -113,6 +113,7 @@ recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",bu
 performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance",box_color="#1f1f1f",text_color="#ffffff")
 positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions",box_color="#1f1f1f",text_color="#ffffff")
 motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "  Motors",box_color="#1f1f1f",text_color="#ffffff")
+botConfigButton = uiHandler.Button(font_small,100,24,60,96,1,text = "  Bot config",box_color="#1f1f1f",text_color="#ffffff")
 # Timer menu options
 compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp",box_color="#1f1f1f",text_color="#ffffff")
 autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton",box_color="#1f1f1f",text_color="#ffffff")
@@ -132,7 +133,7 @@ recOpen = False
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-
+botConfigWin = uiHandler.window(screen,"Bot Configuration",(200,500,400,200),True,False,"#00824f",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -293,6 +294,8 @@ def renderView(screen,cursor_img_rect,events):
         positionsButton.update(screen,cursor_img_rect,events)
         motorsButton.active = True
         motorsButton.update(screen,cursor_img_rect,events)
+        botConfigButton.active = True
+        botConfigButton.update(screen,cursor_img_rect,events)
         if "mouse_button_up" in events and not viewButton.clicked_up:
             viewOpen = False
             performanceButton.active = False
@@ -316,6 +319,12 @@ def renderView(screen,cursor_img_rect,events):
         elif motorsButton.clicked_up and not motorWin.active:
             motorWin.active = True
             motorsButton.text = "✅ Motors"
+        if botConfigButton.clicked_up and botConfigWin.active:
+            botConfigWin.active = False
+            botConfigButton.text = "  Bot Config"
+        elif botConfigButton.clicked_up and not botConfigWin.active:
+            botConfigWin.active = True
+            botConfigButton.text = "✅ Bot Config"
 
 def renderTimer(screen,cursor_img_rect,events):
     global timerOpen
@@ -780,6 +789,7 @@ while 1: # Main game loop
     displayPerformanceStats(screen,clock,performanceWin,events)
     displayPositionStats(screen,clock,posWin,events)
     displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide,power)
+    
     # Render last so huds and displays can show overlays
     if moveFieldUp:
         panOffsetY += moveRate*zoomScale/100
