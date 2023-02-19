@@ -241,8 +241,7 @@ class Button:
                 screen.blit(self.selected_button_image, self.selected_button_image_rect)
 
     def click_check(self, cursor_rect, events):
-        if self.button_box_rect.collidepoint(cursor_rect.topleft) or\
-                self.button_image_rect.collidepoint(cursor_rect.topleft):
+        if self.button_box_rect.collidepoint(cursor_rect.topleft) or self.button_image_rect.collidepoint(cursor_rect.topleft):
             if self.click_type == "left":
                 if self.clicked_down is False and "left_mouse_button_down" in events:
                     self.clicked_down = True

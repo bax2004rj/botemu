@@ -120,6 +120,9 @@ autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills
 driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skills: Driver",box_color="#1f1f1f",text_color="#ffffff")
 noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
 runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)",box_color="#1f1f1f",text_color="#ffffff")
+# Bot config buttons
+ApplyButton = uiHandler.Button(font_small,500,100,140,24,1,text = "Apply",box_color="#1f1f1f",text_color="#ffffff",active=False)
+CancelButton = uiHandler.Button(font_small,300,100,140,24,1,text = "Cancel",box_color="#1f1f1f",text_color="#ffffff",active=False)
 
 fileOpen = False
 editOpen = False
@@ -133,7 +136,7 @@ recOpen = False
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Bot Configuration",(200,500,400,200),True,False,"#00824f",False)
+botConfigWin = uiHandler.window(screen,"Bot Configuration",(200,500,400,200),True,False,"#0082ff",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -283,6 +286,15 @@ def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
         pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
         pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
         pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
+
+def displayBotConfig(screen,clock,win,events,cursor_rect):
+    if win.active:
+        ApplyButton.button_box_rect = (win.rect[1]+170,win.rect[2]+500,140,24)
+        CancelButton.button_box_rect = (win.rect[1]+170,win.rect[2]+500,140,24)
+        ApplyButton.active = True
+        CancelButton.active = True
+        ApplyButton.update(screen,cursor_rect,events)
+        CancelButton.update(screen,cursor_rect,events)
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
@@ -785,12 +797,15 @@ while 1: # Main game loop
     posWin.update(screen,cursor_img_rect,events)
     performanceWin.update(screen,cursor_img_rect,events)
     motorWin.update(screen,cursor_img_rect,events)
+    botConfigWin.update(screen,cursor_img_rect,events)
     # Run window tasks
     displayPerformanceStats(screen,clock,performanceWin,events)
     displayPositionStats(screen,clock,posWin,events)
     displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide,power)
-    
-    # Render last so huds and displays can show overlays
+    displayBotConfig(screen,clock,botConfigWin,events,cursor_img_rect)
+
+    # Objects to be rendered last so huds and displays can show overlays
+    # Zoom overlay
     if moveFieldUp:
         panOffsetY += moveRate*zoomScale/100
     if moveFieldLeft:
