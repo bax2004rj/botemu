@@ -110,12 +110,12 @@ aiButton = uiHandler.Button(font_small,20,24,120,0,1,text="AI",button_type="proc
 timerButton = uiHandler.Button(font_small,35,24,140,0,1,text="Timer",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
 recButton = uiHandler.Button(font_small,50,24,width-200,0,1,text="REC: --:--",button_type="procedural",active=True,text_color="#ff0000",box_color="#1f1f1f")
 #View Menu options
-performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✅ Performance",box_color="#1f1f1f",text_color="#ffffff")
-positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✅ Positions",box_color="#1f1f1f",text_color="#ffffff")
+performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✓ Performance",box_color="#1f1f1f",text_color="#ffffff")
+positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✓ Positions",box_color="#1f1f1f",text_color="#ffffff")
 motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "  Motors",box_color="#1f1f1f",text_color="#ffffff")
 botConfigButton = uiHandler.Button(font_small,100,24,60,96,1,text = "  Bot config",box_color="#1f1f1f",text_color="#ffffff")
 # Timer menu options
-compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✅ Comp",box_color="#1f1f1f",text_color="#ffffff")
+compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✓ Comp",box_color="#1f1f1f",text_color="#ffffff")
 autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton",box_color="#1f1f1f",text_color="#ffffff")
 driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skills: Driver",box_color="#1f1f1f",text_color="#ffffff")
 noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
@@ -318,25 +318,25 @@ def renderView(screen,cursor_img_rect,events):
             performanceButton.text = "  Performance"
         elif performanceButton.clicked_up and not performanceWin.active:
             performanceWin.active = True
-            performanceButton.text = "✅ Performance"
+            performanceButton.text = "✓ Performance"
         if positionsButton.clicked_up and posWin.active:
             posWin.active = False
             positionsButton.text = "  Positions"
         elif positionsButton.clicked_up and not posWin.active:
             posWin.active = True
-            positionsButton.text = "✅ Positions"
+            positionsButton.text = "✓ Positions"
         if motorsButton.clicked_up and motorWin.active:
             motorWin.active = False
             motorsButton.text = "  Motors"
         elif motorsButton.clicked_up and not motorWin.active:
             motorWin.active = True
-            motorsButton.text = "✅ Motors"
+            motorsButton.text = "✓ Motors"
         if botConfigButton.clicked_up and botConfigWin.active:
             botConfigWin.active = False
             botConfigButton.text = "  Bot Config"
         elif botConfigButton.clicked_up and not botConfigWin.active:
             botConfigWin.active = True
-            botConfigButton.text = "✅ Bot Config"
+            botConfigButton.text = "✓ Bot Config"
 
 def renderTimer(screen,cursor_img_rect,events):
     global timerOpen
@@ -364,28 +364,28 @@ def renderTimer(screen,cursor_img_rect,events):
             noTimerButton.active = False
             runTimerButton.active = False
         if compModeButton.clicked_up:
-            compModeButton.text = "✅ Comp"
+            compModeButton.text = "✓ Comp"
             autonSkillsButton.text = "  Skills: Auton"
             driverSkillsButton.text = "  Skills: Driver"
             noTimerButton.text = "  Stopwatch"
             timerMode = "comp"
         if autonSkillsButton.clicked_up:
             compModeButton.text = " Comp"
-            autonSkillsButton.text = "✅ Skills: Auton"
+            autonSkillsButton.text = "✓ Skills: Auton"
             driverSkillsButton.text = "  Skills: Driver"
             noTimerButton.text = "  Stopwatch"
             timerMode = "sa"
         if driverSkillsButton.clicked_up:
             compModeButton.text = "  Comp"
             autonSkillsButton.text = "  Skills: Auton"
-            driverSkillsButton.text = "✅ Skills: Driver"
+            driverSkillsButton.text = "✓ Skills: Driver"
             noTimerButton.text = "  Stopwatch"
             timerMode = "sd"
         if noTimerButton.clicked_up:
             compModeButton.text = "  Comp"
             autonSkillsButton.text = "  Skills: Auton"
             driverSkillsButton.text = "  Skills: Driver"
-            noTimerButton.text = "✅ Stopwatch"
+            noTimerButton.text = "✓ Stopwatch"
             timerMode = "disable"
 
 while 1: # Main game loop
