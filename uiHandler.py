@@ -102,18 +102,31 @@ class window:
                     self.panOffsetY = self.dragStarty + self.panStartY
 
 class checkbutton:
-   def _init_(self,font,text,mode="checkbox",posRect = [0,0,150,24],enabledColor = "#ffffff",
+    def _init_(self,font,text,mode="checkbox",posRect = [0,0,150,24],enabledColor = "#ffffff",
               disabledColor = "#0f0f0f",checkBoxUsesColors = False,hover_sound = None,
-              click_sound = None,default_color = "#1f1f1f",default_state = False):
+              click_sound = None,default_color = "#1f1f1f",default_state = False,text_color = "#ffffff"):
             self.mode = mode # Modes availiable: checkbox, togglebutton, switch
             self.text = text
+            self.font = font
+            self.text_color = text_color
             self.textPlacement = [posRect[2]/2+(24+posRect[0]),posRect[1]]
+            self.data = False
             if mode == "checkbox":
                 self.deaultStateText = " "
                 if default_state:
                     self.defaultStateText = "✓"
+                    self.data = True
                 self.button = Button(font,24,24,posRect[1],posRect[2],1,box_color=default_color,text=self.defaultStateText)
-      
+    def update(self,screen,cursor_rect,events):
+        if self.mode == "checkbox":
+            if self.button.clicked_up and not self.data:
+                self.data = True
+                self.button.text = "✓"
+            elif self.button.clicked_up and self.data:
+                self.data = False
+                self.button.text = " "
+            self.button.update(screen,cursor_rect,events)
+            draw_text(screen,self.textPlacement[0],self.textPlacement[1],self.font,self.text,self.text_color)
 # Button system
 class Button:
     def __init__(self, font, rx=150, ry=100, px=0, py=0, outline_width=6, image_outline=False, aa=False,
