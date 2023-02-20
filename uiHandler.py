@@ -101,6 +101,19 @@ class window:
                     self.panOffsetX = self.dragStartx + self.panStartX
                     self.panOffsetY = self.dragStarty + self.panStartY
 
+class checkbutton:
+   def _init_(self,font,text,mode="checkbox",posRect = [0,0,150,24],enabledColor = "#ffffff",
+              disabledColor = "#0f0f0f",checkBoxUsesColors = False,hover_sound = None,
+              click_sound = None,default_color = "#1f1f1f",default_state = False):
+            self.mode = mode # Modes availiable: checkbox, togglebutton, switch
+            self.text = text
+            self.textPlacement = [posRect[2]/2+(24+posRect[0]),posRect[1]]
+            if mode == "checkbox":
+                self.deaultStateText = " "
+                if default_state:
+                    self.defaultStateText = "✓"
+                self.button = Button(font,24,24,posRect[1],posRect[2],1,box_color=default_color,text=self.defaultStateText)
+      
 # Button system
 class Button:
     def __init__(self, font, rx=150, ry=100, px=0, py=0, outline_width=6, image_outline=False, aa=False,
