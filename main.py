@@ -121,8 +121,9 @@ driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skill
 noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
 runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)",box_color="#1f1f1f",text_color="#ffffff")
 # Bot config buttons
-ApplyButton = uiHandler.Button(font_small,500,100,140,24,1,text = "Apply",box_color="#1f1f1f",text_color="#ffffff",active=False)
-CancelButton = uiHandler.Button(font_small,300,100,140,24,1,text = "Cancel",box_color="#1f1f1f",text_color="#ffffff",active=False)
+weaponConfig = uiHandler.checkButton(font_small,"High goal scoring","checkbox",[0,0,150,24],active = False)
+ApplyButton = uiHandler.Button(font_small,70,24,80,24,1,text = "Apply",box_color="#1f3f6f",text_color="#ffffff",active=False)
+CancelButton = uiHandler.Button(font_small,70,24,0,24,1,text = "Cancel",box_color="#1f1f1f",text_color="#ffffff",active=False)
 
 fileOpen = False
 editOpen = False
@@ -136,7 +137,7 @@ recOpen = False
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Bot Configuration",(200,500,400,200),True,False,"#0082ff",False)
+botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -289,10 +290,13 @@ def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
 
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
-        ApplyButton.button_box_rect = (win.rect[1]+170,win.rect[2]+500,140,24)
-        CancelButton.button_box_rect = (win.rect[1]+170,win.rect[2]+500,140,24)
+        ApplyButton.updatePos(win.rect[1]+170,win.rect[2]+500,140,24)
+        CancelButton.updatePos(win.rect[1]+170,win.rect[2]+500,140,24)
+        weaponConfig.updatePos(win.rect[1]+10,win.rect[2]+24,150,24)
         ApplyButton.active = True
         CancelButton.active = True
+        weaponConfig.active = True
+        weaponConfig.update(screen,cursor_rect,events)
         ApplyButton.update(screen,cursor_rect,events)
         CancelButton.update(screen,cursor_rect,events)
 

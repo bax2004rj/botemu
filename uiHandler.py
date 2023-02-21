@@ -101,24 +101,26 @@ class window:
                     self.panOffsetX = self.dragStartx + self.panStartX
                     self.panOffsetY = self.dragStarty + self.panStartY
 
-class checkbutton:
-    def _init_(self,font,text,mode="checkbox",posRect = [0,0,150,24],enabledColor = "#ffffff",
+class checkButton:
+    def __init__(self,font,text,mode="checkbox",posRect = [0,0,150,24],enabledColor = "#ffffff",
               disabledColor = "#0f0f0f",checkBoxUsesColors = False,hover_sound = None,
-              click_sound = None,default_color = "#1f1f1f",default_state = False,text_color = "#ffffff"):
+              click_sound = None,default_color = "#1f1f1f",default_state = False,text_color = "#ffffff",active = True):
             self.mode = mode # Modes availiable: checkbox, togglebutton, switch
             self.text = text
             self.font = font
             self.text_color = text_color
-            self.textPlacement = [posRect[2]/2+(24+posRect[0]),posRect[1]]
+            self.posRect = posRect
+            self.textPlacement = [self.posRect[2]/2+(24+self.posRect[0]),self.posRect[1]]
             self.data = False
+            self.active = active
+            self.defaultStateText = " "
             if mode == "checkbox":
-                self.deaultStateText = " "
                 if default_state:
                     self.defaultStateText = "✓"
                     self.data = True
-                self.button = Button(font,24,24,posRect[1],posRect[2],1,box_color=default_color,text=self.defaultStateText)
+                self.button = Button(font,14,14,posRect[1],posRect[2],1,box_color=default_color,text=self.defaultStateText)
     def update(self,screen,cursor_rect,events):
-        if self.mode == "checkbox":
+        if self.mode == "checkbox" and self.active:
             if self.button.clicked_up and not self.data:
                 self.data = True
                 self.button.text = "✓"
@@ -127,6 +129,13 @@ class checkbutton:
                 self.button.text = " "
             self.button.update(screen,cursor_rect,events)
             draw_text(screen,self.textPlacement[0],self.textPlacement[1],self.font,self.text,self.text_color)
+    def updatePos(self,x,y,w,h):
+        self.posRect = (x,y,w,h)
+        self.textPlacement = [self.posRect[2]/2+(24+self.posRect[0]),self.posRect[1]]        
+        self.button.outline_rect.x=x
+        self.button.outline_rect.y=y-12
+        self.button.button_box_rect.x = x
+        self.button.button_box_rect.y = y-12
 # Button system
 class Button:
     def __init__(self, font, rx=150, ry=100, px=0, py=0, outline_width=6, image_outline=False, aa=False,
@@ -328,8 +337,21 @@ class Button:
             self.hover_sound_played = False
 
     def update(self, screen, cursor_rect, events):
-        if self.active:
-            self.click_check(cursor_rect, events)
-            self.display_button(screen)
-        else:
-            pass
+        try:
+            if self.active:
+                self.click_check(cursor_rect, events)
+                self.display_button(screen)
+            else:
+                pass
+        except AttributeError:
+            print("Click check failed")
+
+    def updatePos(self,x,y,w,h):    
+        self.outline_rect.x=x
+        self.outline_rect.y=y
+        self.outline_rect.w=w
+        self.outline_rect.w=h
+        self.button_box_rect.x = x
+        self.button_box_rect.y = y
+        self.button_box_rect.w = w
+        self.button_box_rect.h = h
