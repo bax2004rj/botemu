@@ -14,6 +14,7 @@ Run `main.py`
 #### Or if you are more into command lines (Linux/Mac):
 `$ cd {insert where it cloned to here}/botemu && /bin/python3 main.py` 
 ## Basic tutorial
+This software is very complex and multifaceted. Click [Here](https://github.com/bax2004rj/botemu/wiki) to read the manualfor the most in-depth explanation
 ### Bot motion
 Driving is currently done using tank drive (one stick y-axis per side).
 - W/S simulates left side
