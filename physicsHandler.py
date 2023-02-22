@@ -95,6 +95,8 @@ def changediskdata():
     global world
     global discPhysics
     global disks
+    discPhysics = []
+    disks = []
     for i in range(len(discX)):
         discPhysics.append(world.CreateDynamicBody(position = (discX[i]/ppm,-discY[i]/ppm)))
         disks.append(discPhysics[i].CreateCircleFixture(radius = 0.069977,density = 0.5,friction = 0.3))

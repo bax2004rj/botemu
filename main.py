@@ -635,6 +635,9 @@ while 1: # Main game loop
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
                 discX.pop(i)
                 discY.pop(i)
+                physicsHandler.changediskdata()
+                discX = physicsHandler.discX
+                discY = physicsHandler.discY
                 botHeldDisks +=1
         except IndexError:
             print("disk not in index")
