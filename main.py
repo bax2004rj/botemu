@@ -290,15 +290,19 @@ def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
 
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
-        ApplyButton.updatePos(win.rect[1]+170,win.rect[2]+500,140,24)
-        CancelButton.updatePos(win.rect[1]+170,win.rect[2]+500,140,24)
-        weaponConfig.updatePos(win.rect[1]+10,win.rect[2]+24,150,24)
+        ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
+        CancelButton.updatePos(win.adjustedRectX+190,win.adjustedRectY+155,70,24)
+        weaponConfig.updatePos(win.adjustedRectX+10,win.adjustedRectY+30,100,24)
         ApplyButton.active = True
         CancelButton.active = True
         weaponConfig.active = True
         weaponConfig.update(screen,cursor_rect,events)
         ApplyButton.update(screen,cursor_rect,events)
         CancelButton.update(screen,cursor_rect,events)
+        if ApplyButton.clicked_up:
+            win.active = False
+        if CancelButton.clicked_up:
+            win.active = False
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
