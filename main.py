@@ -92,8 +92,8 @@ power = 0
 angle = 40
 addPwr = False
 
-discX = [100,200,300,400,500,600,700,460,356,290,155]
-discY = [100,200,300,400,500,600,700,565,486,411,285]
+discX = physicsHandler.discX
+discY = physicsHandler.discY
 targetX = []
 targetY = []
 targetI = []
@@ -114,6 +114,7 @@ performanceButton = uiHandler.Button(font_small,100,24,60,24,1,text = "✓ Perfo
 positionsButton = uiHandler.Button(font_small,100,24,60,48,1,text = "✓ Positions",box_color="#1f1f1f",text_color="#ffffff")
 motorsButton = uiHandler.Button(font_small,100,24,60,72,1,text = "  Motors",box_color="#1f1f1f",text_color="#ffffff")
 botConfigButton = uiHandler.Button(font_small,100,24,60,96,1,text = "  Bot config",box_color="#1f1f1f",text_color="#ffffff")
+showPhysicsButton = uiHandler.Button(font_small,100,24,60,134,1,text = "  Show hitboxes",box_color="#1f1f1f",text_color="#ffffff")
 # Timer menu options
 compModeButton = uiHandler.Button(font_small,100,24,140,24,1,text = "✓ Comp",box_color="#1f1f1f",text_color="#ffffff")
 autonSkillsButton = uiHandler.Button(font_small,100,24,140,48,1,text = "  Skills: Auton",box_color="#1f1f1f",text_color="#ffffff")
@@ -183,6 +184,8 @@ fpsSpeedScale = 10
 fps = 60
 
 controlMode = "tank"
+
+showPhysics = False
 
 def recordBotKeystrokes(events,fps):
     global moveLeftSide
@@ -306,6 +309,7 @@ def displayBotConfig(screen,clock,win,events,cursor_rect):
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
+    global showPhysics
     if viewOpen:
         pygame.draw.rect(screen,(16,16,16),(60,24,100,200))
         performanceButton.active = True
@@ -316,6 +320,9 @@ def renderView(screen,cursor_img_rect,events):
         motorsButton.update(screen,cursor_img_rect,events)
         botConfigButton.active = True
         botConfigButton.update(screen,cursor_img_rect,events)
+        uiHandler.draw_text(screen,90,125,font_small,"Physics","#828282")
+        showPhysicsButton.active = True
+        showPhysicsButton.update(screen,cursor_img_rect,events)
         if "mouse_button_up" in events and not viewButton.clicked_up:
             viewOpen = False
             performanceButton.active = False
@@ -345,6 +352,12 @@ def renderView(screen,cursor_img_rect,events):
         elif botConfigButton.clicked_up and not botConfigWin.active:
             botConfigWin.active = True
             botConfigButton.text = "✓ Bot Config"
+        if showPhysicsButton.clicked_up and not showPhysics:
+            showPhysics = True
+            showPhysicsButton.text = "✓ Show hitboxes"
+        elif showPhysicsButton.clicked_up and showPhysics:
+            showPhysics = False
+            showPhysicsButton.text = "  Show hitboxes"
 
 def renderTimer(screen,cursor_img_rect,events):
     global timerOpen
@@ -555,7 +568,7 @@ while 1: # Main game loop
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,False) # 
+    discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,showPhysics) # Render box2d physics 
     botX -= 32
     botY -= 32
     botDir = math.degrees(botRadians)+180

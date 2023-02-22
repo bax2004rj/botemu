@@ -4,9 +4,8 @@ import Box2D
 from Box2D.b2 import (world, polygonShape, circleShape, staticBody, dynamicBody)
 
 ppm = 221.22366237
-newdiscX = []
-newdiscY = []
-newdiscI = []
+discX = [100,200,300,400,500,600,700,460,356,290,155]
+discY = [100,200,300,400,500,600,700,565,486,411,285]
 
 def fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle): # Solve firing physics
     powerRange = ((power**2)*(math.sin(2*angle)))/-9.81
@@ -67,6 +66,9 @@ rlg_y = world.CreateStaticBody(
 bot = world.CreateDynamicBody(position = (465/ppm,-730/ppm),angle = 0)
 botPhysicRect = bot.CreatePolygonFixture(box = (0.125,0.125),density=1, friction=.3)
 
+discPhysics = []
+disks = []
+
 # Temporary hitbox rendering system (likely removing when physics works for once), based on kne's demos
 colors = {
     staticBody: (0, 255, 255, 127),
@@ -74,7 +76,7 @@ colors = {
 }
 def my_draw_polygon(polygon, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffsetY,zoom,screen,PPM = 221.22366237):
     vertices = [(body.transform * v) * PPM for v in polygon.vertices]
-    vertices = [(v[0]+(panOffsetx+(width/2))*zoom/100, SCREEN_HEIGHT/2*(zoom/100)+panOffsetY - v[1]) for v in vertices]
+    vertices = [((v[0]*zoom/100)+(panOffsetx+(width/2)), SCREEN_HEIGHT/2+panOffsetY - v[1]*(zoom/100)) for v in vertices]
     pygame.draw.polygon(screen, colors[body.type], vertices)
 polygonShape.draw = my_draw_polygon
 def my_draw_circle(circle, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffsetY,zoom,screen,PPM = 221.22366237):
@@ -85,6 +87,18 @@ def my_draw_circle(circle, body, fixture,SCREEN_HEIGHT,width,panOffsetx,panOffse
     # Note: Python 3.x will enforce that pygame get the integers it requests,
     #       and it will not convert from float.
 circleShape.draw = my_draw_circle
+
+def changediskdata():
+    global discX
+    global discY
+    global ppm
+    global world
+    global discPhysics
+    global disks
+    for i in range(len(discX)):
+        discPhysics.append(world.CreateDynamicBody(position = (discX[i]/ppm,-discY[i]/ppm)))
+        disks.append(discPhysics[i].CreateCircleFixture(radius = 0.069977,density = 0.5,friction = 0.3))
+changediskdata()
 
 def updatePhysics(discX,discY,targetI,botx,boty,botdir,fps,screen,height,width,panOffsetx,panOffsetY,zoom,debug = False): # Create dynamic bodies for box2d
     global world
