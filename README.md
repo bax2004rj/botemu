@@ -9,6 +9,7 @@ Future versions will include installer with autoupdate system
 - `Pygame` & `SDL2`
 - `box2d` & `swig`(install `box2d-kengz` as well if errors occur)
 - `psutil`
+- `pyperclip` - For the crash handler to to copy crash info to you computer's clipboard and allow you to help contribute with reporting issues
 ### Installation
 Run `main.py`
 #### Or if you are more into command lines (Linux/Mac):
