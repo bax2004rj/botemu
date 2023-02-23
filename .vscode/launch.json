@@ -11,6 +11,15 @@
             "program": "main.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: Run installer",
+            "type": "python",
+            "request": "launch",
+            "program": "installer/install.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
+    
 }
