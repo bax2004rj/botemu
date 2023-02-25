@@ -7,7 +7,7 @@ import urllib
 from urllib import request
 import git
 import zipfile
-import sh
+import subprocess
 
 class installer():
     def __init__(self): # Construct welcome screen
@@ -87,6 +87,15 @@ class installer():
         self.rejectButton.pack_forget()
         self.mainText.pack_forget()
         self.tldrButton.pack_forget()
+        self.dirFrame.pack_forget()
+        self.locExplainerText.pack_forget()
+        self.useNet.pack_forget()
+        self.makePortableInstall.pack_forget()
+        self.buildOptionExplainerText.pack_forget()
+        self.betaBuild.pack_forget()
+        self.normalBuild.pack_forget()
+        self.buildVarText.pack_forget()
+        self.nextButton.pack_forget()
         print("Getting system specs")
         self.welcomeText.config(text = "Installing")
         self.explainerText.config(text="Please wait while we install the program")
@@ -108,17 +117,28 @@ class installer():
         self.main.update()
         if self.hasInternet and self.internetEnabled:
             self.progText.config(text="Downloading the app")
-            git.Repo.clone_from("https://github.com/bax2004rj/botemu/",os.path.join(os.getcwd(),"installer","temp"))
             self.main.update()
+            if self.buildVar == "Beta":
+                gitTree = "/tree/beta"
+            else:
+                gitTree = ""
+            git.Repo.clone_from("https://github.com/bax2004rj/botemu%s"%gitTree,os.path.join(os.getcwd(),"installer","temp"),)
         else:
             self.progText.config(text="Extracting app")
-            zipfile.ZipFile.extractall(os.path.join(os.getcwd(),"botemu.zip"),os.path.join(os.getcwd(),"installer","temp"))
             self.main.update()
+            zipfile.ZipFile.extractall(os.path.join(os.getcwd(),"botemu.zip"),os.path.join(os.getcwd(),"installer","temp"))
         self.progText.config(text="Building app")
         self.progressBar.step(25)
         self.main.update()
         self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
         self.cancelButton.pack_forget()
+        subprocess.run("cd %s"%self.downloadLocation)
+        self.progressBar.step(5)
+        self.main.update()
+        subprocess.run("pyinstaller main.spec")
+        self.progressBar.step(10)
+        self.main.update()
+
     def updateAcceptance(self,status):
         if status == True:
             self.nextButton.config(state="normal")
