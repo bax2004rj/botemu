@@ -132,11 +132,8 @@ class installer():
         self.main.update()
         self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
         self.cancelButton.pack_forget()
-        subprocess.run("cd %s"%self.downloadLocation)
-        self.progressBar.step(5)
-        self.main.update()
-        subprocess.run("pyinstaller main.spec")
-        self.progressBar.step(10)
+        subprocess.run("cd %s && pyinstaller main.py"%self.downloadLocation,shell=True)
+        self.progressBar.step(15)
         self.main.update()
 
     def updateAcceptance(self,status):
