@@ -60,7 +60,7 @@ class installer():
         self.explainerText.config(text="Choose the specifics of your install")
         self.buildVar = "Normal"
         self.buildVarText = tkinter.Label(self.main,text = "Choose build version")
-        self.normalBuild = ttk.Radiobutton(self.main,text="Normal/Stable",value = "Normal",variable=self.buildVar,command=lambda s= self,t="Normal":s.updateBuild(t))
+        self.normalBuild = ttk.Radiobutton(self.main,text="Normal/Stable",value = "Normal",variable=self.buildVar,command=lambda s= self,t="Normal":s.updateBuild(t),)
         self.normalBuild.pack(side = "top")
         self.betaBuild = ttk.Radiobutton(self.main,text="Beta",value = "Beta",variable=self.buildVar,command=lambda s= self,t="Beta":s.updateBuild(t))
         self.betaBuild.pack(side = "top")
@@ -132,8 +132,9 @@ class installer():
         self.main.update()
         self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
         self.cancelButton.pack_forget()
-        subprocess.run("cd %s && pyinstaller main.py"%self.downloadLocation,shell=True)
+        subprocess.run("cd %s && pyinstaller main.py -name botemu"%self.downloadLocation,shell=True)
         self.progressBar.step(15)
+        self.progText.config(text="Copying files")
         self.main.update()
 
     def updateAcceptance(self,status):
