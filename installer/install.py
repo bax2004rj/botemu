@@ -8,6 +8,7 @@ from urllib import request
 import git
 import zipfile
 import subprocess
+from contextlib import redirect_stdout
 
 class installer():
     def __init__(self): # Construct welcome screen
@@ -132,10 +133,25 @@ class installer():
         self.main.update()
         self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
         self.cancelButton.pack_forget()
-        subprocess.run("cd %s && pyinstaller main.py -name botemu"%self.downloadLocation,shell=True)
+        subprocess.run("cd %s && pyinstaller main.py -n botemu -add-data %s -onefile"%self.downloadLocation,shell=True)
         self.progressBar.step(15)
-        self.progText.config(text="Copying files")
+        self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
+        self.cancelButton.pack_forget()
         self.main.update()
+        subprocess.run("pkexec cp %s/botemu /bin/"%self.downloadLocation,shell=True)
+        self.progressBar.step(15)
+        self.progText.config(text="Editing system config")
+        with open("/usr/share/applications/botemu.desktop",mode = "wb") as desktop:
+            desktop.writelines("[Desktop Entry]",
+                               "Name = botemu",
+                               "Comment = VEX VRC robot emulator",
+                               "Exec ./bin/botemu",
+                               "Terminal = false",
+                               "Type = Application",
+                               "Icon = prefrences-system-windows",
+                               "Categories = Games;Development",
+                               "Keywords = vex;game",
+                               "X-Desktop-File-Install-Version=0.01a")
 
     def updateAcceptance(self,status):
         if status == True:
