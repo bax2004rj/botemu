@@ -9,6 +9,7 @@ import git
 import zipfile
 import subprocess
 from contextlib import redirect_stdout
+import PyInstaller.__main__
 
 class installer():
     def __init__(self): # Construct welcome screen
@@ -123,7 +124,7 @@ class installer():
                 gitTree = "/tree/beta"
             else:
                 gitTree = ""
-            git.Repo.clone_from("https://github.com/bax2004rj/botemu%s"%gitTree,os.path.join(os.getcwd(),"installer","temp"),)
+            git.Repo.clone_from("https://github.com/bax2004rj/botemu%s"%gitTree,os.path.join(os.getcwd(),"installer","temp"))
         else:
             self.progText.config(text="Extracting app")
             self.main.update()
@@ -133,25 +134,33 @@ class installer():
         self.main.update()
         self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
         self.cancelButton.pack_forget()
-        subprocess.run("cd %s && pyinstaller main.py -n botemu -add-data %s -onefile"%self.downloadLocation,shell=True)
-        self.progressBar.step(15)
+        PyInstaller.__main__.run([
+            '%s'%os.path.join(self.downloadLocation,"main.py"),
+            '--onefile',
+            '--windowed',
+            '--add-data=%s:/tmp'%self.downloadLocation,
+            '-n=botemu',
+            '--distpath=%s'%self.downloadLocation,
+            '--workpath=%s'%os.path.join(self.downloadLocation,"build")
+        ])
+        self.progressBar.step(25)
         self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
         self.cancelButton.pack_forget()
         self.main.update()
         subprocess.run("pkexec cp %s/botemu /bin/"%self.downloadLocation,shell=True)
         self.progressBar.step(15)
         self.progText.config(text="Editing system config")
-        with open("/usr/share/applications/botemu.desktop",mode = "wb") as desktop:
-            desktop.writelines("[Desktop Entry]",
-                               "Name = botemu",
-                               "Comment = VEX VRC robot emulator",
-                               "Exec ./bin/botemu",
-                               "Terminal = false",
-                               "Type = Application",
-                               "Icon = prefrences-system-windows",
-                               "Categories = Games;Development",
-                               "Keywords = vex;game",
-                               "X-Desktop-File-Install-Version=0.01a")
+        subprocess.run("pkexec cp %s /usr/share/applications/botemu.desktop"%os.path.join(os.getcwd(),"installer","botemu.desktop"),shell=True)
+        self.progressBar.step(30)
+        self.finished()
+    def finished(self):
+        self.nextButton.pack(side = "right")
+        self.nextButton.config(text = "Finish",command=quit)
+        self.mainText.config(text = "Finished")
+        self.explainerText.config(text = "Thank you for installing botemu. The installation has completed.")
+        self.locExplainerText.pack_forget()
+        self.progressBar.pack_forget()
+        self.stepBar.step(20)
 
     def updateAcceptance(self,status):
         if status == True:

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name = botemu
+Comment = VEX VRC robot emulator
+Exec = /bin/botemu
+Terminal = false
+Type = Application
+Icon = prefrences-system-windows
+Categories = Games;Development
+Keywords = vex;game
+X-Desktop-File-Install-Version=0.01a
