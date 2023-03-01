@@ -100,12 +100,26 @@ class installer():
         self.nextButton.pack_forget()
         print("Getting system specs")
         self.welcomeText.config(text = "Installing")
+        self.progText = tkinter.Label(self.main,text = "Checking for old installs")
         self.explainerText.config(text="Please wait while we install the program")
-        self.progText = tkinter.Label(self.main)
         self.progText.pack(anchor = "center")
-        self.progText.config(text="Checking for internet")
         self.progressBar = ttk.Progressbar(self.main)
         self.progressBar.pack(fill = "x",anchor = "center")
+        if os.path.exists("/bin/botemu") or os.path.exists("usr/share/applications/botemu.desktop"):
+            oldInstallResponse = messagebox.askyesnocancel("Old install detected","We found an old install of botemu, would you like to uninstall\n(NOTE: All options excluding 'Cancel' will wipe user data and choosing 'No' will coninue installation)")
+            if oldInstallResponse == None:
+                self.finished()
+            elif oldInstallResponse == True:
+                self.welcomeText.config(text = "Uninstalling")
+                self.explainerText.config(text="Sorry to see you go! Your OS may ask for your password to handle deletion.")
+                self.progText.config(text="Removing old install")
+                self.main.update()
+                subprocess.run("pkexec rm /bin/botemu /usr/share/applications/botemu.desktop",shell=True)
+                self.finished()
+            else:
+                pass
+        self.progressBar.step(10)
+        self.progText.config(text="Checking for internet")
         self.hasInternet = False
         self.main.update()
         try:
@@ -138,7 +152,7 @@ class installer():
             '%s'%os.path.join(self.downloadLocation,"main.py"),
             '--onefile',
             '--windowed',
-            '--add-data=%s:/tmp'%self.downloadLocation,
+            '--add-data=%s:/'%self.downloadLocation,
             '-n=botemu',
             '--distpath=%s'%self.downloadLocation,
             '--workpath=%s'%os.path.join(self.downloadLocation,"build")
@@ -147,17 +161,14 @@ class installer():
         self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
         self.cancelButton.pack_forget()
         self.main.update()
-        subprocess.run("pkexec cp %s/botemu /bin/"%self.downloadLocation,shell=True)
-        self.progressBar.step(15)
-        self.progText.config(text="Editing system config")
-        subprocess.run("pkexec cp %s /usr/share/applications/botemu.desktop"%os.path.join(os.getcwd(),"installer","botemu.desktop"),shell=True)
-        self.progressBar.step(30)
+        subprocess.run("pkexec --sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
+        self.progressBar.step(35)
         self.finished()
     def finished(self):
         self.nextButton.pack(side = "right")
         self.nextButton.config(text = "Finish",command=quit)
         self.mainText.config(text = "Finished")
-        self.explainerText.config(text = "Thank you for installing botemu. The installation has completed.")
+        self.explainerText.config(text = "Thank you for installing/uninstalling botemu. The installation has completed.")
         self.locExplainerText.pack_forget()
         self.progressBar.pack_forget()
         self.stepBar.step(20)
