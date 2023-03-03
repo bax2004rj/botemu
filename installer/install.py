@@ -114,64 +114,81 @@ class installer():
                 self.explainerText.config(text="Sorry to see you go! Your OS may ask for your password to handle deletion.")
                 self.progText.config(text="Removing old install")
                 self.main.update()
-                subprocess.run("pkexec rm /bin/botemu /usr/share/applications/botemu.desktop",shell=True)
-                self.finished()
-            else:
-                pass
-        self.progressBar.step(10)
-        self.progText.config(text="Checking for internet")
-        self.hasInternet = False
-        self.main.update()
-        try:
-            request.urlopen("https://www.google.com")
-            self.hasInternet = True
-            print("User has internet!")
-        except:
-            self.hasInternet = False
-            print("User does not have internet, install from internal package!")
-        self.progressBar.step(5)
-        self.main.update()
-        if self.hasInternet and self.internetEnabled:
-            self.progText.config(text="Downloading the app")
-            self.main.update()
-            if self.buildVar == "Beta":
-                gitTree = "/tree/beta"
-            else:
-                gitTree = ""
-            git.Repo.clone_from("https://github.com/bax2004rj/botemu%s"%gitTree,os.path.join(os.getcwd(),"installer","temp"))
+                subprocess.run("pkexec sh -c 'rm /bin/botemu && rm /usr/share/applications/botemu.desktop'",shell=True)
+                self.finished(False)
         else:
-            self.progText.config(text="Extracting app")
+            self.progressBar.step(10)
+            self.progText.config(text="Checking for internet")
+            self.hasInternet = False
             self.main.update()
-            zipfile.ZipFile.extractall(os.path.join(os.getcwd(),"botemu.zip"),os.path.join(os.getcwd(),"installer","temp"))
-        self.progText.config(text="Building app")
-        self.progressBar.step(25)
-        self.main.update()
-        self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
-        self.cancelButton.pack_forget()
-        PyInstaller.__main__.run([
-            '%s'%os.path.join(self.downloadLocation,"main.py"),
-            '--onefile',
-            '--windowed',
-            '--add-data=%s:/'%self.downloadLocation,
-            '-n=botemu',
-            '--distpath=%s'%self.downloadLocation,
-            '--workpath=%s'%os.path.join(self.downloadLocation,"build")
-        ])
-        self.progressBar.step(25)
-        self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
-        self.cancelButton.pack_forget()
-        self.main.update()
-        subprocess.run("pkexec --sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
-        self.progressBar.step(35)
-        self.finished()
-    def finished(self):
+            try:
+                request.urlopen("https://www.google.com")
+                self.hasInternet = True
+                print("User has internet!")
+            except:
+                self.hasInternet = False
+                print("User does not have internet, install from internal package!")
+            self.progressBar.step(5)
+            self.main.update()
+            if self.hasInternet and self.internetEnabled:
+                try:
+                    self.progText.config(text="Downloading the app")
+                    self.main.update()
+                    if self.buildVar == "Beta":
+                        gitTree = "/tree/beta"
+                    else:
+                        gitTree = ""
+                    git.Repo.clone_from("https://github.com/bax2004rj/botemu%s"%gitTree,os.path.join(os.getcwd(),"installer","temp"))
+                except git.exc.GitCommandError:
+                    print("Folder already exists!")
+            else:
+                self.progText.config(text="Extracting app")
+                self.main.update()
+                zipfile.ZipFile.extractall(os.path.join(os.getcwd(),"botemu.zip"),os.path.join(os.getcwd(),"installer","temp"))
+            self.progText.config(text="Building app")
+            self.progressBar.step(25)
+            self.main.update()
+            self.downloadLocation = os.path.join(os.getcwd(),"installer","temp")
+            self.cancelButton.pack_forget()
+            PyInstaller.__main__.run([
+                '%s'%os.path.join(self.downloadLocation,"main.py"),
+                '--onefile',
+                '--windowed',
+                '--add-data=%s:/'%self.downloadLocation,
+                '-n=botemu',
+                '--distpath=%s'%self.downloadLocation,
+                '--workpath=%s'%os.path.join(self.downloadLocation,"build")
+            ])
+            self.progressBar.step(25)
+            self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
+            self.cancelButton.pack_forget()
+            self.main.update()
+            subprocess.run("pkexec sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
+            self.progressBar.step(35)
+            self.finished()
+            
+    def finished(self,installAction=True):
         self.nextButton.pack(side = "right")
-        self.nextButton.config(text = "Finish",command=quit)
-        self.mainText.config(text = "Finished")
-        self.explainerText.config(text = "Thank you for installing/uninstalling botemu. The installation has completed.")
+        self.runApp = tkinter.IntVar()
+        self.openInstalledApp = ttk.Checkbutton(self.main,text = "Launch botemu",variable = self.runApp)
+        if installAction:
+            self.nextButton.config(text = "Finish",command=self.closeAndOpen)
+            self.welcomeText.config(text = "Finished")
+            self.explainerText.config(text = "Thank you for installing botemu. The installation has completed.")
+            self.openInstalledApp.pack()
+        else:
+            self.nextButton.config(text = "Finish",command=quit)
+            self.welcomeText.config(text = "Finished")
+            self.explainerText.config(text = "Thank you for uninstalling botemu. The uninstallation has completed.")
         self.locExplainerText.pack_forget()
+        self.progText.pack_forget()
         self.progressBar.pack_forget()
         self.stepBar.step(20)
+
+    def closeAndOpen(self):
+        if self.runApp.get()==1:
+            self.main.destroy()
+            subprocess.run("botemu",shell=True)
 
     def updateAcceptance(self,status):
         if status == True:
