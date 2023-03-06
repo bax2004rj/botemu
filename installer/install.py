@@ -10,6 +10,7 @@ import zipfile
 import subprocess
 from contextlib import redirect_stdout
 import PyInstaller.__main__
+import json
 
 class installer():
     def __init__(self): # Construct welcome screen
@@ -164,7 +165,9 @@ class installer():
             self.cancelButton.pack_forget()
             self.main.update()
             subprocess.run("pkexec sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
-            self.progressBar.step(35)
+            self.progressBar.step(25)
+            self.progText.config(text="Writing data")
+            self.main.update()
             self.finished()
             
     def finished(self,installAction=True):
