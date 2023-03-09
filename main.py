@@ -11,6 +11,7 @@ import crashHandler
 
 #Other
 import psutil
+import traceback
 
 pygame.init()
 
@@ -501,7 +502,7 @@ try:
         elif "powerUp" in events:
             addPwr = True
             if power <= 100:
-                power += .05*fpsSpeedScale
+                power += .1*fpsSpeedScale
         elif "powerDown" in events:
             addPwr = False
             if power >= 0:
@@ -520,9 +521,9 @@ try:
             recordBotKeystrokes(events,fpsSpeedScale)
 
         if power <= 100 and addPwr:
-            power += .05*fpsSpeedScale
+            power += .5*fpsSpeedScale
         elif power >= 0 and not addPwr:
-            power -= .025*fpsSpeedScale
+            power -= .25*fpsSpeedScale
         
         # Bot control simulation
         botDir += (moveLeftSide-moveRightSide)/256
@@ -846,7 +847,8 @@ try:
         if zoomOut and zoomScale>10:
             zoomScale -= 1
             uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-
+        if addPwr:
+            physicsHandler.testfire(power,angle,botX,botY,botDir,zoomScale,panOffsetX,panOffsetY,screen)
         # Draw scale
         pygame.draw.rect(screen,"#ffffff",(32,height-32,physicsHandler.ppm*(zoomScale/100),5))
         pygame.draw.rect(screen,"#000000",(32,height-32,physicsHandler.ppm*(zoomScale/200),5))
@@ -863,5 +865,6 @@ try:
         clock.tick(framelimit)
         # a #Test crash handler with this
 except Exception as exc:
-    crashHandler.generateCrashMessage(exc)
-    print("Software crashed!")
+    crashHandler.generateCrashMessage(''.join(traceback.format_exception(None, exc, exc.__traceback__)))
+    print("Software crashed!\n======================================")
+    traceback.print_exc()
