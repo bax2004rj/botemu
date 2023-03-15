@@ -25,6 +25,16 @@ def fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,
         targetYInv.append(False)
     print("Range: %f,Target pos:(%d,%d)"%(powerRange,targetX[-1],targetY[-1]))
 
+def testfire(power,angle,botx,boty,botDir,screen,zoom,panOffsetX,panOffsetY,color = "#cf3c00"):
+    powerRange = ((power**2)*(math.sin(2*angle)))/-9.81
+    botRadians = math.radians(botDir-180)
+    targetDraw = []
+    zoomAdjustedBotPos = [(botx+panOffsetX)*(zoom/100),(boty+panOffsetY)*(zoom/100)]
+    targetOut = [botx+(powerRange/256) * math.sin(botRadians),boty+(powerRange/256) * math.cos(botRadians)]
+    targetDraw.append((targetOut[0]+panOffsetX)*(zoom/100))
+    targetDraw.append((targetOut[1]+panOffsetY)*(zoom/100))
+    pygame.draw.line(screen,color,zoomAdjustedBotPos,targetOut,5)
+
 world = world(gravity=(0, 0), doSleep=True)
 
 # Walls

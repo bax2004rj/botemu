@@ -355,3 +355,18 @@ class Button:
         self.button_box_rect.y = y
         self.button_box_rect.w = w
         self.button_box_rect.h = h
+
+class dropdown():
+    def __init__(self,x,y,explainerText,options,defaultOption = None,w=70,h=14):
+        self.x = x
+        self.y = y 
+        self.w = w
+        self.h = h
+        self.explainerText = explainerText
+        self.options = options
+        if defaultOption == None:
+            self.buttonText = "Choose"
+        else:
+            self.buttonText = defaultOption
+
+        self.optionButton = Button(fileHandler.font_small,self.x,self.y,self.w,self.h,text=self.defaultText)

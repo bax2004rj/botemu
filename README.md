@@ -31,4 +31,4 @@ Driving is currently done using tank drive (one stick y-axis per side).
 ### Other game controls
 - Space can start/stop timers
 ### Controller support
-Most controllers (even legal Vex controllers!) can be used to control movement only. The layout was originally adapted for Nintendo Switch pro controller, but it has been tested and  adapter for/with official vex controllers.
+Most controllers (even legal Vex controllers!) can be used to control movement only. The layout was originally adapted for Nintendo Switch pro controller, but it has been tested and adapted for/with official vex controllers.
