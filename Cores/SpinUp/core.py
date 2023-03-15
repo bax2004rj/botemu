@@ -1,6 +1,14 @@
 # Botemu game rendering/example (2022/2023 Spin Up game)
 import coreFileHandler
 import pygame
+import corePhysicsHandler
+# Nab from main
+import sys
+from os import path
+maindirectory = path.path(__file__).abspath()
+sys.path.append(maindirectory.parent.parent)
+import botemu.uiHandler
+
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -27,6 +35,9 @@ ColorRoller3Custody = 0
 ColorRoller4Custody = 0
 bScore = 0
 rScore = 0
+
+botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
+
 def liveScore(): # Calculate 
     bScore = blueHighGoalDisks*5+blueLowGoalDisks
     if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -49,13 +60,13 @@ def liveScore(): # Calculate
     return bScore,rScore
         
 
-def renderLayer1(screen,width,height,panoffsetx,panoffsety,zoomscale): # Render everything that appears under the bot
-    scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
-    scaledDisc = pygame.transform.scale(fileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
-    scaledRedHighGoal = pygame.transform.scale(fileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
-    scaledBlueHighGoal = pygame.transform.scale(fileHandler.blueHighGoal,(blueHighGoalRect.width*(zoomScale/100)*.25,blueHighGoalRect.height*(zoomScale/100)*.25))
-    scaledBlueLowGoal = pygame.transform.scale(fileHandler.blueLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.275,blueHighGoalRect.height*(zoomScale/100)*.25))
-    scaledRedLowGoal = pygame.transform.scale(fileHandler.redLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.30,blueHighGoalRect.height*(zoomScale/100)*.25))
+def renderLayer1(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale): # Render everything that appears under the bot
+    scaledGameField = pygame.transform.scale(coreFileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
+    scaledDisc = pygame.transform.scale(coreFileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
+    scaledRedHighGoal = pygame.transform.scale(coreFileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
+    scaledBlueHighGoal = pygame.transform.scale(coreFileHandler.blueHighGoal,(blueHighGoalRect.width*(zoomScale/100)*.25,blueHighGoalRect.height*(zoomScale/100)*.25))
+    scaledBlueLowGoal = pygame.transform.scale(coreFileHandler.blueLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.275,blueHighGoalRect.height*(zoomScale/100)*.25))
+    scaledRedLowGoal = pygame.transform.scale(coreFileHandler.redLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.30,blueHighGoalRect.height*(zoomScale/100)*.25))
     scaledRedLowGoal = pygame.transform.rotate(scaledRedLowGoal,180)
     scaledFieldRect = scaledGameField.get_rect()
     # Draw game objects
@@ -139,50 +150,50 @@ def renderLayer1(screen,width,height,panoffsetx,panoffsety,zoomscale): # Render 
             print("disk not in index")
             pass        
 
-def renderLayer2(): # Render everything that appears above the bot
+def renderLayer2(screen,width,height,panOffsetX,panOffsetY,zoomScale): # Render everything that appears above the bot
     if ColorRoller1Custody == 0:
             pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
             pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller1Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller1Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller1Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+    if ColorRoller1Custody == 1:
+        pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+        pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
+    if ColorRoller1Custody == 2:
+        pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+    if ColorRoller1Custody == 3:
+        pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
         pygame.draw.rect(screen,(64,64,64),((200*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(64*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller2Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller2Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller2Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller2Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+    if ColorRoller2Custody == 0:
+        pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+        pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
+    if ColorRoller2Custody == 1:
+        pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+        pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
+    if ColorRoller2Custody == 2:
+        pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
+    if ColorRoller2Custody == 3:
+        pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
         pygame.draw.rect(screen,(64,64,64),((0*zoomScale/100)+(width/2 + panOffsetX),(150*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
-        if ColorRoller3Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        pygame.draw.rect(screen,(64,64,64),((782*zoomScale/100)+(width/2 + panOffsetX),(600*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
-        if ColorRoller4Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller3Custody == 0:
+        pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+        pygame.draw.rect(screen,(0,0,255),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller3Custody == 1:
+        pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+        pygame.draw.rect(screen,(255,0,0),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller3Custody == 2:
+        pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller3Custody == 3:
+        pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+    pygame.draw.rect(screen,(64,64,64),((782*zoomScale/100)+(width/2 + panOffsetX),(600*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
+    if ColorRoller4Custody == 0:
+        pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+        pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller4Custody == 1:
+        pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+        pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller4Custody == 2:
+        pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
+    if ColorRoller4Custody == 3:
+        pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
         if colorRoller1Rect.colliderect(botRect) and intake and "user_event_2" in events:
             print("Color roller 1 changing")
             if ColorRoller1Custody == 0:
