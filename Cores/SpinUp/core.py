@@ -5,10 +5,51 @@ import corePhysicsHandler
 # Nab from main
 import sys
 from os import path
+import math
 maindirectory = path.path(__file__).abspath()
 sys.path.append(maindirectory.parent.parent)
-import botemu.uiHandler
+import botemu.uiHandler as uiHandler
 
+# Zoom data 
+zoomScale = 100
+
+# Field movement: Mouse
+panStartX = 0
+panStartY = 0
+dragging = False
+dragStartx = 0
+dragStarty = 0
+panOffsetX = 0
+panOffsetY = 0
+
+# Field movement: Keyboard
+moveFieldUp = False
+moveFieldDown = False
+moveFieldLeft = False
+moveFieldRight = False
+zoomIn = False
+zoomOut = False
+moveRate = 1
+
+# Bot positioning
+defaultX = 465
+defaultY = 730
+botX = defaultX
+botY = defaultY
+botDir = 0
+moveLeftSide = 0
+moveRightSide = 0
+moveLeft = 0
+moveRight = 0
+intake = False
+power = 0
+angle = 40
+addPwr = False
+playfieldRect = coreFileHandler.gameField.get_rect()
+redHighGoalRect = coreFileHandler.redHighGoal.get_rect()
+blueHighGoalRect = coreFileHandler.blueHighGoal.get_rect()
+redLowGoalRect = coreFileHandler.redLowGoal.get_rect()
+blueLowGoalRect = coreFileHandler.blueLowGoal.get_rect()
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -35,32 +76,89 @@ ColorRoller3Custody = 0
 ColorRoller4Custody = 0
 bScore = 0
 rScore = 0
+discX = corePhysicsHandler.discX
+discY = corePhysicsHandler.discY
+targetX = []
+targetY = []
+targetI = []
+targetXInv = []
+targetYInv = []
+controlMode = "tank"
 
-botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
+def initCore(screen):
+    botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
 
-def liveScore(): # Calculate 
-    bScore = blueHighGoalDisks*5+blueLowGoalDisks
-    if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
-        bScore += 10
-    if ColorRoller2Custody == 2:
-        bScore += 10
-    if ColorRoller3Custody == 2:
-        bScore += 10
-    if ColorRoller4Custody == 2:
-        bScore += 10
-    rScore = blueHighGoalDisks*5+blueLowGoalDisks
-    if ColorRoller1Custody == 3: # May look weird, but this is to make sure all color rollers are accounted for
-        rScore += 10
-    if ColorRoller2Custody == 3:
-        rScore += 10
-    if ColorRoller3Custody == 3:
-        rScore += 10
-    if ColorRoller4Custody == 3:
-        rScore += 10
-    return bScore,rScore
-        
+def recordBotKeystrokes(events,fps):
+    global moveLeftSide
+    global moveRightSide
+    global moveLeft
+    global moveRight
+    global intake
+    global controlMode
+    if controlMode == "tank":
+        if "up_key_down" in events:
+            moveLeftSide = -512/fps
+        elif "down_key_down" in events:
+            moveLeftSide = 512/fps
+        elif "left_key_down" in events:
+            moveLeft = 512/fps
+        elif "right_key_down" in events:
+            moveRight = 512/fps
+        elif "right_side_up_down" in events:
+            moveRightSide = -512/fps
+        elif "right_side_down_down" in events:
+            moveRightSide = 512/fps
+        elif "up_key_up" in events:
+            moveLeftSide = 0
+        elif "down_key_up" in events:
+            moveLeftSide = 0    
+        elif "left_key_up" in events:
+            moveLeft = 0
+        elif "right_key_up" in events:
+            moveRight = 0
+        elif "right_side_up_up" in events:
+            moveRightSide = 0
+        elif "right_side_down_up" in events:
+            moveRightSide = 0
+        elif "run_intake" in events:
+            intake = True
+        elif "stop_intake" in events:
+            intake = False
 
-def renderLayer1(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale): # Render everything that appears under the bot
+def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics = False): # Render everything that appears under the bot
+    # Color roller physics rect
+    global colorRoller1Rect
+    global colorRoller2Rect
+    global colorRoller3Rect
+    global colorRoller4Rect
+    global blueLowGoalHitbox
+    global redLowGoalHitbox
+    # Variables
+    global get_ticks_last_frame 
+    # Game scores: High goal
+    global botHeldDisks 
+    global redHighGoalDisks
+    global blueHighGoalDisks 
+    # Game scores: Low goal
+    global redLowGoalDisks
+    global blueLowGoalDisks 
+    # Game scores: Endgame Expansion
+    global redEndgameTiles
+    global blueEndgameTiles
+    # Game scores: Owned color roller (0:neutral(blue next),1:neutral(red next),2:blue claimed,3:red claimed)
+    global ColorRoller1Custody
+    global ColorRoller2Custody
+    global ColorRoller3Custody
+    global ColorRoller4Custody
+    global bScore
+    global rScore
+    global discX 
+    global discY 
+    global targetX
+    global targetY
+    global targetI
+    global targetXInv 
+    global targetYInv 
     scaledGameField = pygame.transform.scale(coreFileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
     scaledDisc = pygame.transform.scale(coreFileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
     scaledRedHighGoal = pygame.transform.scale(coreFileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
@@ -75,7 +173,7 @@ def renderLayer1(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedSca
     screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
     # Get rects for collision
     botRect = pygame.Rect((botX,botY),(64,64))
-    discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,showPhysics) # Render box2d physics 
+    discX,discY,[botX,botY],botRadians = corePhysicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,showPhysics) # Render box2d physics 
     botX -= 32
     botY -= 32
     botDir = math.degrees(botRadians)+180
@@ -142,15 +240,15 @@ def renderLayer1(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedSca
             if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
                 discX.pop(i)
                 discY.pop(i)
-                physicsHandler.changediskdata()
-                discX = physicsHandler.discX
-                discY = physicsHandler.discY
+                corePhysicsHandler.changediskdata()
+                discX = corePhysicsHandler.discX
+                discY = corePhysicsHandler.discY
                 botHeldDisks +=1
         except IndexError:
             print("disk not in index")
             pass        
-
-def renderLayer2(screen,width,height,panOffsetX,panOffsetY,zoomScale): # Render everything that appears above the bot
+    scaledRedBot = pygame.transform.scale(coreFileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
+    scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
     if ColorRoller1Custody == 0:
             pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
             pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
@@ -239,3 +337,22 @@ def renderLayer2(screen,width,height,panOffsetX,panOffsetY,zoomScale): # Render 
         screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
         uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
         uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
+        bScore = blueHighGoalDisks*5+blueLowGoalDisks
+        if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
+            bScore += 10
+        if ColorRoller2Custody == 2:
+            bScore += 10
+        if ColorRoller3Custody == 2:
+            bScore += 10
+        if ColorRoller4Custody == 2:
+            bScore += 10
+        rScore = blueHighGoalDisks*5+blueLowGoalDisks
+        if ColorRoller1Custody == 3: # May look weird, but this is to make sure all color rollers are accounted for
+            rScore += 10
+        if ColorRoller2Custody == 3:
+            rScore += 10
+        if ColorRoller3Custody == 3:
+            rScore += 10
+        if ColorRoller4Custody == 3:
+            rScore += 10
+        return bScore,rScore
