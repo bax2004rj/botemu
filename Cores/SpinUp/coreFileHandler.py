@@ -1,6 +1,6 @@
 import pygame
 import os
-game_dir = os.path.join(os.getcwd(),"Assets")
+game_dir = os.path.join(os.getcwd(),"Cores","SpinUp","Assets")
 # Core assets (When creating your own cores, you can replace these entirely with your own)
 gameField = pygame.image.load(os.path.join(game_dir, 'gameField.png'))
 blueLowGoal = pygame.image.load(os.path.join(game_dir, 'blueLowGoal.png'))

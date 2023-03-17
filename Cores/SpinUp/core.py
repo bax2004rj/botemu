@@ -1,14 +1,13 @@
 # Botemu game rendering/example (2022/2023 Spin Up game)
-import coreFileHandler
+import Cores.SpinUp.coreFileHandler as coreFileHandler
 import pygame
-import corePhysicsHandler
+import Cores.SpinUp.corePhysicsHandler as corePhysicsHandler
 # Nab from main
 import sys
 from os import path
 import math
-maindirectory = path.path(__file__).abspath()
-sys.path.append(maindirectory.parent.parent)
-import botemu.uiHandler as uiHandler
+import uiHandler
+import eventHandler
 
 # Zoom data 
 zoomScale = 100
@@ -37,6 +36,7 @@ defaultY = 730
 botX = defaultX
 botY = defaultY
 botDir = 0
+botRadians = 0
 moveLeftSide = 0
 moveRightSide = 0
 moveLeft = 0
@@ -159,6 +159,62 @@ def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,
     global targetI
     global targetXInv 
     global targetYInv 
+    global botX
+    global botY
+    global botRadians
+    global botDir   
+    global dragging
+    global panStartX
+    global panStartY
+    global moveFieldUp
+    global moveFieldLeft
+    global moveFieldRight
+    global moveFieldDown
+    global zoomIn
+    
+    if "mouse_button_down" in events:
+        if eventHandler.eventButton == 2:
+                dragging = True
+                dragStartx,dragStarty = eventHandler.eventPos
+                panStartX = panOffsetX - dragStartx
+                panStartY = panOffsetY - dragStarty
+        elif "mouse_button_up" in events:
+            dragging = False
+        elif "mouse_motion" in events:
+            if dragging == True:
+                dragStartx,dragStarty = eventHandler.eventPos
+                panOffsetX = dragStartx + panStartX
+                panOffsetY = dragStarty + panStartY
+        elif "fieldUp_down" in events:
+            moveFieldUp = True
+        elif "fieldLeft_down" in events:
+            moveFieldLeft = True
+        elif "fieldRight_down" in events:
+            moveFieldRight = True
+        elif "fieldDown_down" in events:
+            moveFieldDown = True
+        elif "fieldZoomIn_down" in events:
+            zoomIn = True
+        elif "fieldZoomOut_down" in events:
+            zoomOut = True
+        elif "fieldUp_up" in events:
+            moveFieldUp = False
+        elif "fieldLeft_up" in events:
+            moveFieldLeft = False
+        elif "fieldRight_up" in events:
+            moveFieldRight = False
+        elif "fieldDown_up" in events:
+            moveFieldDown = False
+        elif "fieldZoomIn_up" in events:
+            zoomIn = False
+        elif "fieldZoomOut_up" in events:
+            zoomOut = False
+        elif "mouseWheel" in events and eventHandler.scrollAmount > 0 and zoomScale<1000:
+            zoomScale +=1
+            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+        elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
+            zoomScale -=1
+            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
     scaledGameField = pygame.transform.scale(coreFileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
     scaledDisc = pygame.transform.scale(coreFileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
     scaledRedHighGoal = pygame.transform.scale(coreFileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
@@ -355,4 +411,9 @@ def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,
             rScore += 10
         if ColorRoller4Custody == 3:
             rScore += 10
-        return bScore,rScore
+        if zoomOut and zoomScale>10:
+            zoomScale -= 1
+            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+        if addPwr:
+            corePhysicsHandler.testfire(power,angle,botX,botY,botDir,zoomScale,panOffsetX,panOffsetY,screen)
+        return bScore,rScore,zoomScale
