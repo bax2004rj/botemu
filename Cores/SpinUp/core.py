@@ -85,8 +85,19 @@ targetXInv = []
 targetYInv = []
 controlMode = "tank"
 
-def initCore(screen):
-    botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
+screen = None
+botConfigWin = None
+
+def getScreen(screenIn):
+    global screen
+    global botConfigWin
+    screen = screenIn
+    botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,600,400),True,False,"#008250",False)
+
+def botConfig(screen,win):
+    global botConfigWin
+    if botConfigWin.active:
+        pass
 
 def recordBotKeystrokes(events,fps):
     global moveLeftSide
@@ -124,6 +135,37 @@ def recordBotKeystrokes(events,fps):
             intake = True
         elif "stop_intake" in events:
             intake = False
+
+def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
+    global fpsSpeedScale
+    if win.active:
+        # Draw rectangles
+        lcolR = 255
+        lcolG = 0
+        revl = 0
+        rcolR = 255
+        rcolG = 0
+        revr = 0
+        try:
+            lcolR = abs(lspeed)/2
+            lcolG = abs(lspeed)/2
+            revl = 0
+            if lspeed < 0:
+                revl = 255
+            rcolR = abs(lspeed)/2
+            rcolG = abs(lspeed)/2
+            revr = 0
+            if rspeed > 0:
+                revr = 255
+        except ZeroDivisionError:
+            lcolR = 255
+            lcolG = 0
+            revl = 0
+        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+30,32,48))
+        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
+        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
+        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
+
 
 def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics = False): # Render everything that appears under the bot
     # Color roller physics rect
@@ -215,6 +257,41 @@ def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,
         elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
             zoomScale -=1
             uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
+        elif "powerUp" in events:
+            addPwr = True
+            if power <= 100:
+                power += .1*fpsSpeedScale
+        elif "powerDown" in events:
+            addPwr = False
+            if power >= 0:
+                power -= .05*fpsSpeedScale
+        elif "fire" in events:
+            if botHeldDisks > 0:
+                corePhysicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
+                botHeldDisks -=1
+        try:
+            if eventHandler.control.joy_name == "":
+                recordBotKeystrokes(events)
+            else:
+                moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
+                moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
+        except Exception:
+            recordBotKeystrokes(events,fpsSpeedScale)
+
+        if power <= 100 and addPwr:
+            power += .5*fpsSpeedScale
+        elif power >= 0 and not addPwr:
+            power -= .25*fpsSpeedScale
+        
+        # Bot control simulation
+        botDir += (moveLeftSide-moveRightSide)/256
+        botRadians = math.radians(botDir-180)
+        botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
+        botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
+        if botDir>360:
+            botDir = 0
+        elif botDir<0:
+            botDir = 360
     scaledGameField = pygame.transform.scale(coreFileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
     scaledDisc = pygame.transform.scale(coreFileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
     scaledRedHighGoal = pygame.transform.scale(coreFileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))

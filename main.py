@@ -14,7 +14,7 @@ import psutil
 import traceback
 
 # Cores
-import Cores.SpinUp.core
+import Cores.SpinUp.core as Core
 
 pygame.init()
 
@@ -82,29 +82,6 @@ zoomIn = False
 zoomOut = False
 moveRate = 1
 
-# Bot positioning
-defaultX = 465
-defaultY = 730
-botX = defaultX
-botY = defaultY
-botDir = 0
-moveLeftSide = 0
-moveRightSide = 0
-moveLeft = 0
-moveRight = 0
-intake = False
-power = 0
-angle = 40
-addPwr = False
-
-discX = physicsHandler.discX
-discY = physicsHandler.discY
-targetX = []
-targetY = []
-targetI = []
-targetXInv = []
-targetYInv = []
-
 # Button definitions here
 # Menu bar
 fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
@@ -127,9 +104,7 @@ driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skill
 noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
 runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)",box_color="#1f1f1f",text_color="#ffffff")
 # Bot config buttons
-weaponConfig = uiHandler.checkButton(font_small,"High goal scoring","checkbox",[0,0,150,24],active = False)
-ApplyButton = uiHandler.Button(font_small,70,24,80,24,1,text = "Apply",box_color="#1f3f6f",text_color="#ffffff",active=False)
-CancelButton = uiHandler.Button(font_small,70,24,0,24,1,text = "Cancel",box_color="#1f1f1f",text_color="#ffffff",active=False)
+ApplyButton = uiHandler.Button(font_small,70,24,80,24,1,text = "OK",box_color="#1f3f6f",text_color="#ffffff",active=False)
 
 fileOpen = False
 editOpen = False
@@ -143,7 +118,7 @@ recOpen = False
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
 posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
+botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,400,200),True,False,"#870000",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -266,51 +241,19 @@ def displayPositionStats(screen,clock,win,events):
         uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
 
-def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
-    global fpsSpeedScale
-    if win.active:
-        # Draw rectangles
-        lcolR = 255
-        lcolG = 0
-        revl = 0
-        rcolR = 255
-        rcolG = 0
-        revr = 0
-        try:
-            lcolR = abs(lspeed)/2
-            lcolG = abs(lspeed)/2
-            revl = 0
-            if lspeed < 0:
-                revl = 255
-            rcolR = abs(lspeed)/2
-            rcolG = abs(lspeed)/2
-            revr = 0
-            if rspeed > 0:
-                revr = 255
-        except ZeroDivisionError:
-            lcolR = 255
-            lcolG = 0
-            revl = 0
-        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+30,32,48))
-        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
-        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
-        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
-
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
-        ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
-        CancelButton.updatePos(win.adjustedRectX+190,win.adjustedRectY+155,70,24)
-        weaponConfig.updatePos(win.adjustedRectX+10,win.adjustedRectY+30,100,24)
-        ApplyButton.active = True
-        CancelButton.active = True
-        weaponConfig.active = True
-        weaponConfig.update(screen,cursor_rect,events)
-        ApplyButton.update(screen,cursor_rect,events)
-        CancelButton.update(screen,cursor_rect,events)
-        if ApplyButton.clicked_up:
-            win.active = False
-        if CancelButton.clicked_up:
-            win.active = False
+        try:
+            Core.botConfig.active = True
+            Core.botConfig(screen)
+        except Exception:
+            win.active = True
+            uiHandler.draw_text(screen,win.rect[0],win.rect[1]+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
+            ApplyButton.active = True
+            ApplyButton.update(screen,cursor_rect,events)
+            if ApplyButton.clicked_up:
+                win.active = False
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
@@ -413,7 +356,7 @@ def renderTimer(screen,cursor_img_rect,events):
             driverSkillsButton.text = "  Skills: Driver"
             noTimerButton.text = "✓ Stopwatch"
             timerMode = "disable"
-Cores.SpinUp.core.initCore(screen)
+Core.getScreen(screen)
 try:
     while 1: # Main game loop
         # Get time, solve for FPS
@@ -459,41 +402,6 @@ try:
                 if timerMode == "disabled":
                     totalSecondsRemaining = -1
                     matchTime = 1
-        elif "powerUp" in events:
-            addPwr = True
-            if power <= 100:
-                power += .1*fpsSpeedScale
-        elif "powerDown" in events:
-            addPwr = False
-            if power >= 0:
-                power -= .05*fpsSpeedScale
-        elif "fire" in events:
-            if botHeldDisks > 0:
-                physicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
-                botHeldDisks -=1
-        try:
-            if eventHandler.control.joy_name == "":
-                recordBotKeystrokes(events)
-            else:
-                moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
-                moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
-        except Exception:
-            recordBotKeystrokes(events,fpsSpeedScale)
-
-        if power <= 100 and addPwr:
-            power += .5*fpsSpeedScale
-        elif power >= 0 and not addPwr:
-            power -= .25*fpsSpeedScale
-        
-        # Bot control simulation
-        botDir += (moveLeftSide-moveRightSide)/256
-        botRadians = math.radians(botDir-180)
-        botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
-        botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
-        if botDir>360:
-            botDir = 0
-        elif botDir<0:
-            botDir = 360
         # Update and calculate scores TODO: Calculate endgame scores
         bScore = blueHighGoalDisks*5+blueLowGoalDisks
         if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -518,7 +426,7 @@ try:
         screen.fill("#0f0f0f")
         
         # Run core
-        Cores.SpinUp.core.renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics)
+        Core.renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics)
         pygame.draw.rect(screen,(32,32,32),(0,0,width,24))
         fileButton.active = True
         fileButton.update(screen,cursor_img_rect,events)
@@ -606,7 +514,7 @@ try:
         # Run window tasks
         displayPerformanceStats(screen,clock,performanceWin,events)
         displayPositionStats(screen,clock,posWin,events)
-        displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide,power)
+        Core.displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide)
         displayBotConfig(screen,clock,botConfigWin,events,cursor_img_rect)
 
         # Objects to be rendered last so huds and displays can show overlays
