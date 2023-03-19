@@ -116,9 +116,9 @@ recOpen = False
 
 # Window definitions here
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
-posWin = uiHandler.window(screen,"Error - Positions",(25,300,200,150),True,False,"#8700cf",True)
+posWin = uiHandler.window(screen,"Error - Positions",(25,300,200,100),True,False,"#870000",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,400,100),True,False,"#870000",False)
+botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,200,100),True,False,"#870000",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -238,8 +238,8 @@ def displayPositionStats(screen,clock,win,events,cursor_rect = cursor_img_rect):
             Core.botPositionStats(screen)
         except Exception:
             win.active = True
-            uiHandler.draw_text(screen,win.rect[0],win.rect[1]+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
-            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
+            uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a position window","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+50,70,24)
             ApplyButton.active = True
             ApplyButton.update(screen,cursor_rect,events)
             if ApplyButton.clicked_up:
@@ -252,8 +252,8 @@ def displayBotConfig(screen,clock,win,events,cursor_rect):
             Core.botConfig(screen)
         except Exception:
             win.active = True
-            uiHandler.draw_text(screen,win.rect[0],win.rect[1]+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
-            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
+            uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+50,70,24)
             ApplyButton.active = True
             ApplyButton.update(screen,cursor_rect,events)
             if ApplyButton.clicked_up:
