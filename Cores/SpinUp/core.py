@@ -87,11 +87,17 @@ controlMode = "tank"
 
 screen = None
 botConfigWin = None
+posWin = None
+motorWin = None
 
 def getScreen(screenIn):
     global screen
     global botConfigWin
+    global posWin
+    global motorWin
     screen = screenIn
+    posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
+    motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
     botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,600,400),True,False,"#008250",False)
 
 def botConfig(screen,win):
@@ -136,7 +142,7 @@ def recordBotKeystrokes(events,fps):
         elif "stop_intake" in events:
             intake = False
 
-def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
+def displayMotorStats(screen, clock, win, events,lspeed = moveLeftSide,rspeed = moveRightSide,power = power):
     global fpsSpeedScale
     if win.active:
         # Draw rectangles
@@ -165,6 +171,21 @@ def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
         pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
         pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
         pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
+
+
+def displayPositionStats(screen,clock,win,events,font_small):
+    global botX
+    global botY
+    global botDir
+    global power
+    if win.active:
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
+        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
+        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
 
 
 def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics = False): # Render everything that appears under the bot
@@ -213,6 +234,10 @@ def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,
     global moveFieldRight
     global moveFieldDown
     global zoomIn
+    global power
+    global addPwr
+    global moveLeftSide
+    global moveRightSide
     
     if "mouse_button_down" in events:
         if eventHandler.eventButton == 2:

@@ -116,9 +116,9 @@ recOpen = False
 
 # Window definitions here
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
-posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
+posWin = uiHandler.window(screen,"Error - Positions",(25,300,200,150),True,False,"#8700cf",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,400,200),True,False,"#870000",False)
+botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,400,100),True,False,"#870000",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -227,19 +227,23 @@ def displayPerformanceStats(screen,clock,win,events):
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+170,font_small,"Usage:{0}".format(cpu),cpuColor)
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+190,font_small,"Cores:{0}".format(psutil.cpu_count()),cpuColor)
 
-def displayPositionStats(screen,clock,win,events):
+def displayPositionStats(screen,clock,win,events,cursor_rect = cursor_img_rect):
     global botX
     global botY
     global botDir
     global power
     if win.active:
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
+        try:
+            Core.botPositions.active = True
+            Core.botPositionStats(screen)
+        except Exception:
+            win.active = True
+            uiHandler.draw_text(screen,win.rect[0],win.rect[1]+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
+            ApplyButton.active = True
+            ApplyButton.update(screen,cursor_rect,events)
+            if ApplyButton.clicked_up:
+                win.active = False
 
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
@@ -514,7 +518,7 @@ try:
         # Run window tasks
         displayPerformanceStats(screen,clock,performanceWin,events)
         displayPositionStats(screen,clock,posWin,events)
-        Core.displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide)
+        Core.displayMotorStats(screen,clock,motorWin,events)
         displayBotConfig(screen,clock,botConfigWin,events,cursor_img_rect)
 
         # Objects to be rendered last so huds and displays can show overlays
