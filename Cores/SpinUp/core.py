@@ -178,6 +178,9 @@ def displayPositionStats(screen,clock,win,events,font_small):
     global botY
     global botDir
     global power
+    global zoomScale
+    global panOffsetX
+    global panOffsetY
     if win.active:
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
         uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")

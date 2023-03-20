@@ -234,8 +234,8 @@ def displayPositionStats(screen,clock,win,events,cursor_rect = cursor_img_rect):
     global power
     if win.active:
         try:
-            Core.botPositions.active = True
-            Core.botPositionStats(screen)
+            Core.posWin.active = True
+            Core.displayPositionStats(screen,clock,Core.posWin,events,font_small)
         except Exception:
             win.active = True
             uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a position window","#FFFFFF")
@@ -248,8 +248,8 @@ def displayPositionStats(screen,clock,win,events,cursor_rect = cursor_img_rect):
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
         try:
-            Core.botConfig.active = True
-            Core.botConfig(screen)
+            Core.botConfigWin.active = True
+            Core.botConfig(screen,clock,Core.botConfigWin,events,font_small)
         except Exception:
             win.active = True
             uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
