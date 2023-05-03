@@ -119,6 +119,8 @@ performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,Fal
 posWin = uiHandler.window(screen,"Error - Positions",(25,300,200,100),True,False,"#870000",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
 botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,200,100),True,False,"#870000",False)
+botConfigWin.enabled = True
+posWin.enabled = True
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
