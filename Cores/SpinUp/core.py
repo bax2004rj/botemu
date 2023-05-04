@@ -4,11 +4,15 @@ import pygame
 import Cores.SpinUp.corePhysicsHandler as corePhysicsHandler
 # Nab from main
 import sys
-from os import path
+import os
+import math
+from pathlib import Path
 
-maindirectory = path.path(__file__).abspath()
-sys.path.append(maindirectory.parent.parent)
-import botemu.uiHandler## UI Handler
+# Get UIhandler from dir 
+#maindirectory = os.Path(__file__)##.abspath()
+#sys.path.append(maindirectory.parent.parent)
+import uiHandler
+import eventHandler
 
 # Zoom data 
 zoomScale = 100
