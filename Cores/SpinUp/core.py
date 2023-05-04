@@ -5,9 +5,10 @@ import Cores.SpinUp.corePhysicsHandler as corePhysicsHandler
 # Nab from main
 import sys
 from os import path
-import math
-import uiHandler
-import eventHandler
+
+maindirectory = path.path(__file__).abspath()
+sys.path.append(maindirectory.parent.parent)
+import botemu.uiHandler## UI Handler
 
 # Zoom data 
 zoomScale = 100
