@@ -7,7 +7,7 @@ import sys
 from os import path
 maindirectory = path.path(__file__).abspath()
 sys.path.append(maindirectory.parent.parent)
-import botemu.uiHandler
+import botemu.uiHandler## UI Handler
 
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
