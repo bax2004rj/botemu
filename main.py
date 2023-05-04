@@ -13,6 +13,9 @@ import crashHandler
 import psutil
 import traceback
 
+# Cores
+import Cores.SpinUp.core as Core
+
 pygame.init()
 
 #Audio setups
@@ -28,7 +31,7 @@ width = 1000
 height = 600
 screen = pygame.display.set_mode((1000,600),pygame.RESIZABLE)
 
-pygame.display.set_caption("5842C bot emulator")
+pygame.display.set_caption("Spin Up - botemu")
 # Mouse setup
 pygame.mouse.set_visible(False)
 cursors = fileHandler.get_cursor_files()
@@ -79,29 +82,6 @@ zoomIn = False
 zoomOut = False
 moveRate = 1
 
-# Bot positioning
-defaultX = 465
-defaultY = 730
-botX = defaultX
-botY = defaultY
-botDir = 0
-moveLeftSide = 0
-moveRightSide = 0
-moveLeft = 0
-moveRight = 0
-intake = False
-power = 0
-angle = 40
-addPwr = False
-
-discX = physicsHandler.discX
-discY = physicsHandler.discY
-targetX = []
-targetY = []
-targetI = []
-targetXInv = []
-targetYInv = []
-
 # Button definitions here
 # Menu bar
 fileButton = uiHandler.Button(font_small,30,24,0,0,1,text="File",button_type="procedural",active=True,box_color="#1f1f1f",text_color="#ffffff")
@@ -124,9 +104,7 @@ driverSkillsButton = uiHandler.Button(font_small,100,24,140,72,1,text = "  Skill
 noTimerButton = uiHandler.Button(font_small,100,24,140,96,1,text = "  Stopwatch",box_color="#1f1f1f",text_color="#ffffff")
 runTimerButton = uiHandler.Button(font_small,100,24,140,144,1,text = "Run timer (space)",box_color="#1f1f1f",text_color="#ffffff")
 # Bot config buttons
-weaponConfig = uiHandler.checkButton(font_small,"High goal scoring","checkbox",[0,0,150,24],active = False)
-ApplyButton = uiHandler.Button(font_small,70,24,80,24,1,text = "Apply",box_color="#1f3f6f",text_color="#ffffff",active=False)
-CancelButton = uiHandler.Button(font_small,70,24,0,24,1,text = "Cancel",box_color="#1f1f1f",text_color="#ffffff",active=False)
+ApplyButton = uiHandler.Button(font_small,70,24,80,24,1,text = "OK",box_color="#1f3f6f",text_color="#ffffff",active=False)
 
 fileOpen = False
 editOpen = False
@@ -138,9 +116,9 @@ recOpen = False
 
 # Window definitions here
 performanceWin = uiHandler.window(screen,"Performance",(25,100,200,200),True,False,"#0050cf",True)
-posWin = uiHandler.window(screen,"Positions",(25,300,200,150),True,False,"#5000cf",True)
+posWin = uiHandler.window(screen,"Error - Positions",(25,300,200,100),True,False,"#870000",True)
 motorWin = uiHandler.window(screen,"Motors",(25,450,200,150),True,False,"#870000",False)
-botConfigWin = uiHandler.window(screen,"Bot Configuration",(250,250,400,200),True,False,"#008250",False)
+botConfigWin = uiHandler.window(screen,"Error - Bot config",(250,250,200,100),True,False,"#870000",False)
 # Color roller physics rect
 colorRoller1Rect = pygame.Rect(554,784,48,16)
 colorRoller2Rect = pygame.Rect(200,0,48,16)
@@ -249,65 +227,37 @@ def displayPerformanceStats(screen,clock,win,events):
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+170,font_small,"Usage:{0}".format(cpu),cpuColor)
         uiHandler.draw_text(screen,(win.adjustedRectX+win.adjustedWidth)/2,win.adjustedRectY+190,font_small,"Cores:{0}".format(psutil.cpu_count()),cpuColor)
 
-def displayPositionStats(screen,clock,win,events):
+def displayPositionStats(screen,clock,win,events,cursor_rect = cursor_img_rect):
     global botX
     global botY
     global botDir
     global power
     if win.active:
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+50,font_small,"X:%d"%(botX+32),"#FF0000")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+74,font_small,"Y:%d"%(botY+32),"#00FF00")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+98,font_small,"Dir:%d"%botDir,"#0000FF")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+50,font_small,"Field X:%d"%panOffsetX,"#FFD0D0")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+74,font_small,"Field Y:%d"%panOffsetY,"#D0FFD0")
-        uiHandler.draw_text(screen,win.adjustedRectX+150,win.adjustedRectY+125,font_small,"Zoom:%d"%zoomScale,"#00FF87")
-        uiHandler.draw_text(screen,win.adjustedRectX+30,win.adjustedRectY+125,font_small,"Power:%d"%power,"#FFFFFF")
-
-def displayMotorStats(screen, clock, win, events,lspeed,rspeed,power):
-    global fpsSpeedScale
-    if win.active:
-        # Draw rectangles
-        lcolR = 255
-        lcolG = 0
-        revl = 0
-        rcolR = 255
-        rcolG = 0
-        revr = 0
         try:
-            lcolR = abs(lspeed)/2
-            lcolG = abs(lspeed)/2
-            revl = 0
-            if lspeed < 0:
-                revl = 255
-            rcolR = abs(lspeed)/2
-            rcolG = abs(lspeed)/2
-            revr = 0
-            if rspeed > 0:
-                revr = 255
-        except ZeroDivisionError:
-            lcolR = 255
-            lcolG = 0
-            revl = 0
-        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+30,32,48))
-        pygame.draw.rect(screen,(lcolR,lcolG,revl),(win.adjustedRectX+30,win.adjustedRectY+90,32,48))
-        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+30,32,48))
-        pygame.draw.rect(screen,(rcolR,rcolG,revr),(win.adjustedRectX+90,win.adjustedRectY+90,32,48))
+            Core.posWin.active = True
+            Core.displayPositionStats(screen,clock,Core.posWin,events,font_small)
+        except Exception:
+            win.active = True
+            uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a position window","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+50,70,24)
+            ApplyButton.active = True
+            ApplyButton.update(screen,cursor_rect,events)
+            if ApplyButton.clicked_up:
+                win.active = False
 
 def displayBotConfig(screen,clock,win,events,cursor_rect):
     if win.active:
-        ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+155,70,24)
-        CancelButton.updatePos(win.adjustedRectX+190,win.adjustedRectY+155,70,24)
-        weaponConfig.updatePos(win.adjustedRectX+10,win.adjustedRectY+30,100,24)
-        ApplyButton.active = True
-        CancelButton.active = True
-        weaponConfig.active = True
-        weaponConfig.update(screen,cursor_rect,events)
-        ApplyButton.update(screen,cursor_rect,events)
-        CancelButton.update(screen,cursor_rect,events)
-        if ApplyButton.clicked_up:
-            win.active = False
-        if CancelButton.clicked_up:
-            win.active = False
+        try:
+            Core.botConfigWin.active = True
+            Core.botConfig(screen,clock,Core.botConfigWin,events,font_small)
+        except Exception:
+            win.active = True
+            uiHandler.draw_text(screen,win.adjustedRectX,win.adjustedRectY+24,font_small,"Error: This core doesn't have a bot config tool","#FFFFFF")
+            ApplyButton.updatePos(win.adjustedRectX+100,win.adjustedRectY+50,70,24)
+            ApplyButton.active = True
+            ApplyButton.update(screen,cursor_rect,events)
+            if ApplyButton.clicked_up:
+                win.active = False
 
 def renderView(screen,cursor_img_rect,events):
     global viewOpen
@@ -410,7 +360,7 @@ def renderTimer(screen,cursor_img_rect,events):
             driverSkillsButton.text = "  Skills: Driver"
             noTimerButton.text = "✓ Stopwatch"
             timerMode = "disable"
-
+Core.getScreen(screen)
 try:
     while 1: # Main game loop
         # Get time, solve for FPS
@@ -439,49 +389,6 @@ try:
         if "terminate" in events:
             pygame.quit()
             exit()
-        elif "mouse_button_down" in events:
-            if eventHandler.eventButton == 2:
-                dragging = True
-                dragStartx,dragStarty = eventHandler.eventPos
-                panStartX = panOffsetX - dragStartx
-                panStartY = panOffsetY - dragStarty
-        elif "mouse_button_up" in events:
-            dragging = False
-        elif "mouse_motion" in events:
-            if dragging == True:
-                dragStartx,dragStarty = eventHandler.eventPos
-                panOffsetX = dragStartx + panStartX
-                panOffsetY = dragStarty + panStartY
-        elif "fieldUp_down" in events:
-            moveFieldUp = True
-        elif "fieldLeft_down" in events:
-            moveFieldLeft = True
-        elif "fieldRight_down" in events:
-            moveFieldRight = True
-        elif "fieldDown_down" in events:
-            moveFieldDown = True
-        elif "fieldZoomIn_down" in events:
-            zoomIn = True
-        elif "fieldZoomOut_down" in events:
-            zoomOut = True
-        elif "fieldUp_up" in events:
-            moveFieldUp = False
-        elif "fieldLeft_up" in events:
-            moveFieldLeft = False
-        elif "fieldRight_up" in events:
-            moveFieldRight = False
-        elif "fieldDown_up" in events:
-            moveFieldDown = False
-        elif "fieldZoomIn_up" in events:
-            zoomIn = False
-        elif "fieldZoomOut_up" in events:
-            zoomOut = False
-        elif "mouseWheel" in events and eventHandler.scrollAmount > 0 and zoomScale<1000:
-            zoomScale +=1
-            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-        elif "mouseWheel" in events and eventHandler.scrollAmount < 0 and zoomScale>10:
-            zoomScale -=1
-            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
         elif runTimerButton.clicked_up or "space_down" in events: 
             if timerRunning:
                 timerStart_ticks = pygame.time.get_ticks()
@@ -499,41 +406,6 @@ try:
                 if timerMode == "disabled":
                     totalSecondsRemaining = -1
                     matchTime = 1
-        elif "powerUp" in events:
-            addPwr = True
-            if power <= 100:
-                power += .1*fpsSpeedScale
-        elif "powerDown" in events:
-            addPwr = False
-            if power >= 0:
-                power -= .05*fpsSpeedScale
-        elif "fire" in events:
-            if botHeldDisks > 0:
-                physicsHandler.fire(botHeldDisks,discX,discY,targetX,targetY,targetI,targetXInv,targetYInv,botX,botY,botDir,power,angle)
-                botHeldDisks -=1
-        try:
-            if eventHandler.control.joy_name == "":
-                recordBotKeystrokes(events)
-            else:
-                moveLeftSide = eventHandler.control.axis_data[1]*512/fpsSpeedScale
-                moveRightSide = eventHandler.control.axis_data[3]*512/fpsSpeedScale
-        except Exception:
-            recordBotKeystrokes(events,fpsSpeedScale)
-
-        if power <= 100 and addPwr:
-            power += .5*fpsSpeedScale
-        elif power >= 0 and not addPwr:
-            power -= .25*fpsSpeedScale
-        
-        # Bot control simulation
-        botDir += (moveLeftSide-moveRightSide)/256
-        botRadians = math.radians(botDir-180)
-        botX += -((moveLeftSide+moveRightSide)/256) * math.sin(botRadians)
-        botY += -((moveLeftSide+moveRightSide)/256) * math.cos(botRadians)
-        if botDir>360:
-            botDir = 0
-        elif botDir<0:
-            botDir = 360
         # Update and calculate scores TODO: Calculate endgame scores
         bScore = blueHighGoalDisks*5+blueLowGoalDisks
         if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
@@ -556,190 +428,9 @@ try:
         
         # Draw playfield
         screen.fill("#0f0f0f")
-        # Scale objects
-        scaledGameField = pygame.transform.scale(fileHandler.gameField,(playfieldRect.width*(zoomScale/100),playfieldRect.height*(zoomScale/100)))
-        scaledDisc = pygame.transform.scale(fileHandler.disc,(playfieldRect.width*(zoomScale/100)*.05,playfieldRect.height*(zoomScale/100)*.05))
-        scaledRedHighGoal = pygame.transform.scale(fileHandler.redHighGoal,(redHighGoalRect.width*(zoomScale/100)*.25,redHighGoalRect.height*(zoomScale/100)*.25))
-        scaledBlueHighGoal = pygame.transform.scale(fileHandler.blueHighGoal,(blueHighGoalRect.width*(zoomScale/100)*.25,blueHighGoalRect.height*(zoomScale/100)*.25))
-        scaledBlueLowGoal = pygame.transform.scale(fileHandler.blueLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.275,blueHighGoalRect.height*(zoomScale/100)*.25))
-        scaledRedLowGoal = pygame.transform.scale(fileHandler.redLowGoal,(blueLowGoalRect.width*(zoomScale/100)*.30,blueHighGoalRect.height*(zoomScale/100)*.25))
-        scaledRedLowGoal = pygame.transform.rotate(scaledRedLowGoal,180)
-        scaledFieldRect = scaledGameField.get_rect()
-        # Draw game objects
-        screen.blit(scaledGameField,(width/2+panOffsetX,height/2+panOffsetY))
-        screen.blit(scaledBlueLowGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(272*zoomScale/100)),(height/2+panOffsetY)+(132*zoomScale/100)))
-        screen.blit(scaledRedLowGoal,((width/2+panOffsetX)+(132*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(275*zoomScale/100))))
-        # Get rects for collision
-        botRect = pygame.Rect((botX,botY),(64,64))
-        discX,discY,[botX,botY],botRadians = physicsHandler.updatePhysics(discX,discY,targetI,botRect.centerx,botRect.centery,botRadians,fps,screen,height,width,panOffsetX,panOffsetY,zoomScale,showPhysics) # Render box2d physics 
-        botX -= 32
-        botY -= 32
-        botDir = math.degrees(botRadians)+180
-        for i in range(len(discX)): # Check collision and draw, sees length instead of values to support multiple disks at same position 
-            if i in targetI:
-                targetxi = targetX[targetI.index(i)]
-                targetyi = targetY[targetI.index(i)]
-                targetXInvV = targetXInv[targetI.index(i)]
-                targetYInvV = targetYInv[targetI.index(i)]
-                addX = targetxi/targetyi
-                addY = targetyi/targetxi
-                try:
-                    if targetxi < discX[i]:
-                        discX[i] += addX*10*fpsSpeedScale
-                    if targetyi < discY[i]:    
-                        discY[i] += addY*10*fpsSpeedScale
-                    if targetxi > discX[i]:
-                        discX[i] -= addX*10*fpsSpeedScale
-                    if targetyi > discY[i]:    
-                        discY[i] -= addY*10*fpsSpeedScale
-                except IndexError:
-                    print("disk animation error")
-                try:
-                    if not targetXInvV and targetxi >= discX[i]:
-                        targetX.pop(targetI.index(i))
-                        targetY.pop(targetI.index(i))
-                        targetI.pop(targetI.index(i))
-                        targetXInv.pop(targetI.index(i))
-                        targetYInv.pop(targetI.index(i))
-                    if targetXInvV and targetxi <= discX[i]:
-                        targetX.pop(targetI.index(i))
-                        targetY.pop(targetI.index(i))
-                        targetI.pop(targetI.index(i))
-                        targetXInv.pop(targetI.index(i))
-                        targetYInv.pop(targetI.index(i))
-                    if not targetYInvV and targetyi >= discY[i]:
-                        targetX.pop(targetI.index(i))
-                        targetY.pop(targetI.index(i))
-                        targetI.pop(targetI.index(i))
-                        targetXInv.pop(targetI.index(i))
-                        targetYInv.pop(targetI.index(i))
-                    if targetYInvV and targetyi <= discY[i]:
-                        targetX.pop(targetI.index(i))
-                        targetY.pop(targetI.index(i))
-                        targetI.pop(targetI.index(i))
-                        targetXInv.pop(targetI.index(i))
-                        targetYInv.pop(targetI.index(i))
-                except Exception:
-                    try:
-                        targetX.pop(targetI.index(i))
-                        targetY.pop(targetI.index(i))
-                        targetI.pop(targetI.index(i))
-                        targetXInv.pop(targetI.index(i))
-                        targetYInv.pop(targetI.index(i))
-                    except Exception:
-                        pass
-                    print("Probably reached target")
-            try:
-                screen.blit(scaledDisc,((discX[i]*zoomScale/100)+(width/2+panOffsetX),(discY[i]*zoomScale/100)+(height/2+panOffsetY)))    
-            except Exception:
-                print("Blit error")
-            try:
-                currentDiscRect = pygame.Rect((discX[i],discY[i]),(16,16))
-                if currentDiscRect.colliderect(botRect) and botHeldDisks<3 and intake==True: 
-                    discX.pop(i)
-                    discY.pop(i)
-                    physicsHandler.changediskdata()
-                    discX = physicsHandler.discX
-                    discY = physicsHandler.discY
-                    botHeldDisks +=1
-            except IndexError:
-                print("disk not in index")
-                pass        
-        # Draw bots before anything above it
-        scaledRedBot = pygame.transform.scale(fileHandler.redbot,(32*(zoomScale/50),32*(zoomScale/50)))
-        scaledRedBot = pygame.transform.rotate(scaledRedBot,botDir)
-        screen.blit(scaledRedBot,((width/2+panOffsetX)+(botX*zoomScale/100),(height/2+panOffsetY)+(botY*zoomScale/100)))
-        uiHandler.draw_text(screen,(width/2+panOffsetX)+((botX+32)*zoomScale/100),(height/2+panOffsetY)+((botY+32)*zoomScale/100),font_default,"%d"%botHeldDisks,"#FFFFFF")
-        pygame.draw.rect(screen,(64,64,64),((550*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(64*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller1Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller1Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller1Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller1Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((554*zoomScale/100)+(width/2 + panOffsetX),(784*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        pygame.draw.rect(screen,(64,64,64),((200*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(64*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller2Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller2Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(8*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(8*zoomScale/100)))
-        if ColorRoller2Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        if ColorRoller2Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((204*zoomScale/100)+(width/2 + panOffsetX),(0*zoomScale/100)+(height/2+panOffsetY),(48*zoomScale/100),(16*zoomScale/100)))
-        pygame.draw.rect(screen,(64,64,64),((0*zoomScale/100)+(width/2 + panOffsetX),(150*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
-        if ColorRoller3Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((8*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller3Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((0*zoomScale/100)+(width/2 + panOffsetX),(154*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        pygame.draw.rect(screen,(64,64,64),((782*zoomScale/100)+(width/2 + panOffsetX),(600*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(64*zoomScale/100)))
-        if ColorRoller4Custody == 0:
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 1:
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(8*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 2:
-            pygame.draw.rect(screen,(0,0,255),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        if ColorRoller4Custody == 3:
-            pygame.draw.rect(screen,(255,0,0),((782*zoomScale/100)+(width/2 + panOffsetX),(604*zoomScale/100)+(height/2+panOffsetY),(16*zoomScale/100),(48*zoomScale/100)))
-        if colorRoller1Rect.colliderect(botRect) and intake and "user_event_2" in events:
-            print("Color roller 1 changing")
-            if ColorRoller1Custody == 0:
-                ColorRoller1Custody = 2
-            elif ColorRoller1Custody == 1:
-                ColorRoller1Custody = 3
-            elif ColorRoller1Custody == 2:
-                ColorRoller1Custody = 1
-            elif ColorRoller1Custody == 3:
-                ColorRoller1Custody = 0
-        if colorRoller2Rect.colliderect(botRect) and intake and "user_event_2" in events:
-            print("Color roller 2 changing")
-            if ColorRoller2Custody == 0:
-                ColorRoller2Custody = 2
-            elif ColorRoller2Custody == 1:
-                ColorRoller2Custody = 3
-            elif ColorRoller2Custody == 2:
-                ColorRoller2Custody = 1
-            elif ColorRoller2Custody == 3:
-                ColorRoller2Custody = 0
-        if colorRoller3Rect.colliderect(botRect) and intake and "user_event_2" in events:
-            print("Color roller 2 changing")
-            if ColorRoller3Custody == 0:
-                ColorRoller3Custody = 2
-            elif ColorRoller3Custody == 1:
-                ColorRoller3Custody = 3
-            elif ColorRoller3Custody == 2:
-                ColorRoller3Custody = 1
-            elif ColorRoller3Custody == 3:
-                ColorRoller3Custody = 0
-        if colorRoller4Rect.colliderect(botRect) and intake and "user_event_2" in events:
-            print("Color roller 2 changing")
-            if ColorRoller4Custody == 0:
-                ColorRoller4Custody = 2
-            elif ColorRoller4Custody == 1:
-                ColorRoller4Custody = 3
-            elif ColorRoller4Custody == 2:
-                ColorRoller4Custody = 1
-            elif ColorRoller4Custody == 3:
-                ColorRoller4Custody = 0
-        # High goals
-        screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
-        screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
-        uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
-        uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
-        # Draw top menu bar
+        
+        # Run core
+        Core.renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,events,font_default,fps,showPhysics)
         pygame.draw.rect(screen,(32,32,32),(0,0,width,24))
         fileButton.active = True
         fileButton.update(screen,cursor_img_rect,events)
@@ -817,7 +508,6 @@ try:
             addModeZero = ""
         else:
             addModeZero = "0"
-
         uiHandler.draw_text(screen,width-40,10,font_small,"Time: %d:%s%d"%(minutesRemaining,addzero,secondsRemaining),"#ffffff")
         uiHandler.draw_text(screen,width-110,10,font_small,"%s: %d:%s%d"%(gameStageText,modeMinutesRemaining,addModeZero,modeSecondsRemaining),"#ffffff")
         # Draw windows
@@ -828,7 +518,7 @@ try:
         # Run window tasks
         displayPerformanceStats(screen,clock,performanceWin,events)
         displayPositionStats(screen,clock,posWin,events)
-        displayMotorStats(screen,clock,motorWin,events,moveLeftSide,moveRightSide,power)
+        Core.displayMotorStats(screen,clock,motorWin,events)
         displayBotConfig(screen,clock,botConfigWin,events,cursor_img_rect)
 
         # Objects to be rendered last so huds and displays can show overlays
@@ -844,11 +534,6 @@ try:
         if zoomIn and zoomScale<500:
             zoomScale += 1
             uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-        if zoomOut and zoomScale>10:
-            zoomScale -= 1
-            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-        if addPwr:
-            physicsHandler.testfire(power,angle,botX,botY,botDir,zoomScale,panOffsetX,panOffsetY,screen)
         # Draw scale
         pygame.draw.rect(screen,"#ffffff",(32,height-32,physicsHandler.ppm*(zoomScale/100),5))
         pygame.draw.rect(screen,"#000000",(32,height-32,physicsHandler.ppm*(zoomScale/200),5))
