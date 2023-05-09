@@ -11,6 +11,7 @@ import subprocess
 from contextlib import redirect_stdout
 import PyInstaller.__main__
 import json
+import shutil
 
 class installer():
     def __init__(self): # Construct welcome screen
@@ -161,11 +162,15 @@ class installer():
                 '--workpath=%s'%os.path.join(self.downloadLocation,"build")
             ])
             self.progressBar.step(25)
-            self.progText.config(text="Copying files \n Warning: the system will ask for password to copy to /bin")
+            self.progText.config(text="Installing app")
             self.cancelButton.pack_forget()
             self.main.update()
-            subprocess.run("pkexec sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
-            self.progressBar.step(25)
+            shutil.copy("%s/botemu" (self.downloadLocation),"/bin/")
+            ##subprocess.run("pkexec sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
+            self.progressBar.step(6.25)
+            self.progText.config(text="Creating shortcuts")
+            shutil.copy(os.path.join(os.getcwd(),"installer","botemu.desktop"),"/usr/share/applications/botemu.desktop")
+            self.progressBar.step(6.25)
             self.progText.config(text="Writing data")
             self.main.update()
             self.finished()
