@@ -11,13 +11,17 @@ import subprocess
 from contextlib import redirect_stdout
 import PyInstaller.__main__
 import json
+from json.decoder import JSONDecodeError
 import shutil
+from PIL import ImageTk
 
 class installer():
     def __init__(self): # Construct welcome screen
         self.main = tkinter.Tk(None,None," Botemu installer")
         self.main.geometry("600x400+0+0")
         self.main.resizable(False,False)
+        self.imageFile = os.path.join(os.getcwd(),"installer","install.png")
+        self.main.iconphoto(True,tkinter.PhotoImage(self.imageFile))
         sv_ttk.set_theme("dark")
         self.stepBar = ttk.Progressbar(self.main)
         self.stepBar.pack(side = "top",fill = "x")
@@ -165,13 +169,26 @@ class installer():
             self.progText.config(text="Installing app")
             self.cancelButton.pack_forget()
             self.main.update()
-            shutil.copy("%s/botemu" (self.downloadLocation),"/bin/")
+            self.tempLocation = os.path.join(self.downloadLocation,"botemu")
+            shutil.copy(self.tempLocation,"/bin/")
             ##subprocess.run("pkexec sh -c 'cp %s/botemu /bin/ && cp %s /usr/share/applications/botemu.desktop'"%(self.downloadLocation,os.path.join(os.getcwd(),"installer","botemu.desktop")),shell=True)
             self.progressBar.step(6.25)
             self.progText.config(text="Creating shortcuts")
+            shutil.copy(os.path.join(os.getcwd(),"installer","icon.svg"),"/usr/share/icons/botemu.svg")
+            self.progressBar.step(6.25)
             shutil.copy(os.path.join(os.getcwd(),"installer","botemu.desktop"),"/usr/share/applications/botemu.desktop")
             self.progressBar.step(6.25)
             self.progText.config(text="Writing data")
+            self.username = os.getlogin()
+            self.homeDir = os.path.join("home",self.username)
+            self.userDir = os.path.join(self.homeDir,"Botemu")
+            self.coreDir = os.path.join(self.userDir,"Cores")
+            os.makedirs(self.coreDir)
+            self.settings = {"coreStorage":self.userDir,"updateType":self.buildVar}
+            with open(os.path.join(self.userDir,"settings.json"),"w") as settings:    
+                json.dump(self.settings,settings)
+            shutil.copy(os.path.join(self.downloadLocation,"Cores"),self.userDir)
+            self.progressBar.step(6.25)
             self.main.update()
             self.finished()
             
@@ -205,7 +222,7 @@ class installer():
             self.nextButton.config(state="disabled")
     
     def tldr(self):
-        messagebox.showinfo("GPLV3 TLDR","You are free to:\n - do aynything you would like with this (even modify source code!), but please keep the license as-is\n Notice: THIS SOFTWARE HAS NO WARRANTY")
+        messagebox.showinfo("GPLV3 TLDR","You are free to:\n - do anything you would like with this (even modify source code!), but please keep the license as-is\n Notice: THIS SOFTWARE HAS NO WARRANTY")
 
     def updateBuild(self,status):
         self.buildVar = status
