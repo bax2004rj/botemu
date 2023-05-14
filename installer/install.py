@@ -181,7 +181,7 @@ class installer():
             self.progText.config(text="Writing data")
             self.username = os.getlogin()
             self.homeDir = os.path.join("home",self.username)
-            self.userDir = os.path.join(self.homeDir,"Botemu")
+            self.userDir = os.path.join(self.homeDir,"Botemu_data")
             self.coreDir = os.path.join(self.userDir,"Cores")
             os.makedirs(self.coreDir)
             self.settings = {"coreStorage":self.userDir,"updateType":self.buildVar}

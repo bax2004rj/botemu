@@ -8,6 +8,9 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 save_dir = os.path.join(current_dir, 'bin')
 font_dir = os.path.join(current_dir, 'Font')
 
+homeDir = os.path.join("home",os.getlogin())
+userDir = os.path.join(homeDir,"Botemu_data")
+
 audio_dir = os.path.join(current_dir, 'Audio')
 music_dir = os.path.join(audio_dir, 'Music')
 player_audio_dir = os.path.join(audio_dir, 'Player')
@@ -86,27 +89,30 @@ bluebot = pygame.image.load(os.path.join(game_dir, 'bluebot.png'))
 redbot = pygame.image.load(os.path.join(game_dir, 'redbot.png'))
 
 # Create functions so these files are accessible
+settings_layout = {"coreStorage":"/home/user/Botemu_data","updateType":"normal"}
+
 def save_data(data):
-    with open(os.path.join(save_dir, 's.bin'), 'w') as save_file:
+    with open(os.path.join(save_dir, 'settings.json'), 'w') as save_file:
         json.dump(data, save_file)
 
 
 def get_save_data(data_layout):
     try:
-        with open(os.path.join(save_dir, 's.bin')) as save_file:
+        with open(os.path.join(save_dir, 'settings.json')) as save_file:
             print("attempting to load file...")
             return json.load(save_file)
     except JSONDecodeError:
         print("JSON can't decode...")
-        with open(os.path.join(save_dir, 's.bin'), 'w') as save_file_2:
+        with open(os.path.join(save_dir, 'settings.json'), 'w') as save_file_2:
             json.dump(data_layout, save_file_2)
         return data_layout
     except FileNotFoundError:
         print("file not found...")
-        with open(os.path.join(save_dir, 's.bin'), 'w') as save_file_3:
+        with open(os.path.join(save_dir, 'settings.json'), 'w') as save_file_3:
             json.dump(data_layout, save_file_3)
         return data_layout
 
+get_save_data(settings_layout)
 
 
 def get_font_default():
