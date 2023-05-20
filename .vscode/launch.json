@@ -18,6 +18,7 @@
             "request": "launch",
             "program": "installer/install.py",
             "console": "integratedTerminal",
+            "sudo": true,
             "justMyCode": true
         }
     ]

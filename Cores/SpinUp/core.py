@@ -4,8 +4,13 @@ import pygame
 import Cores.SpinUp.corePhysicsHandler as corePhysicsHandler
 # Nab from main
 import sys
-from os import path
+import os
 import math
+from pathlib import Path
+
+# Get UIhandler from dir 
+#maindirectory = os.Path(__file__)##.abspath()
+#sys.path.append(maindirectory.parent.parent)
 import uiHandler
 import eventHandler
 
@@ -497,28 +502,4 @@ def renderall(screen,width,height,panOffsetX,panOffsetY,zoomScale,fpsSpeedScale,
         screen.blit(scaledRedHighGoal,((width/2+panOffsetX)+(scaledFieldRect.width-(160*zoomScale/100)),(height/2+panOffsetY)+(50*zoomScale/100)))
         screen.blit(scaledBlueHighGoal,((width/2+panOffsetX)+(50*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(160*zoomScale/100))))
         uiHandler.draw_text(screen,(width/2+panOffsetX)+(scaledFieldRect.width-(90*zoomScale/100)),(height/2+panOffsetY)+(114*zoomScale/100),font_default,"%d"%redHighGoalDisks,"#FFFFFF")
-        uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")
-        bScore = blueHighGoalDisks*5+blueLowGoalDisks
-        if ColorRoller1Custody == 2: # May look weird, but this is to make sure all color rollers are accounted for
-            bScore += 10
-        if ColorRoller2Custody == 2:
-            bScore += 10
-        if ColorRoller3Custody == 2:
-            bScore += 10
-        if ColorRoller4Custody == 2:
-            bScore += 10
-        rScore = blueHighGoalDisks*5+blueLowGoalDisks
-        if ColorRoller1Custody == 3: # May look weird, but this is to make sure all color rollers are accounted for
-            rScore += 10
-        if ColorRoller2Custody == 3:
-            rScore += 10
-        if ColorRoller3Custody == 3:
-            rScore += 10
-        if ColorRoller4Custody == 3:
-            rScore += 10
-        if zoomOut and zoomScale>10:
-            zoomScale -= 1
-            uiHandler.draw_text(screen,width/2,height/2,font_default,"Zoom: %d"%zoomScale,"#00FF87")
-        if addPwr:
-            corePhysicsHandler.testfire(power,angle,botX,botY,botDir,zoomScale,panOffsetX,panOffsetY,screen)
-        return bScore,rScore,zoomScale
+        uiHandler.draw_text(screen,(width/2+panOffsetX)+(114*zoomScale/100),(height/2+panOffsetY)+(scaledFieldRect.height-(90*zoomScale/100)),font_default,"%d"%blueHighGoalDisks,"#FFFFFF")##
