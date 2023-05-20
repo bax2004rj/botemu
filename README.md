@@ -1,9 +1,12 @@
 # VEX V5 Competition emulator
 ![screenshot](mdImg/about.png)
-If IFI isnt going to do it, I will.
+If IFI isnt going to do it, I (and anyone willing to help) will.
 This fulfills the needs for a simulator for Vexcode Pro. It will eventually be used as a vessel for a machine learning model to create the perfect auton
+## Where you are
+You are currently viewing the v2Beta fork, which involves a new 3D version built in Panda3D. This version aims to be more stable and be updated to fit the new Vex season. The UI shouldn't deviate too much from the original design.
 ## Installation
-Future versions will include installer with autoupdate system
+This version will include installer with autoupdate system around release time.
+Since this is so early into development, take any install instructions with a grain of salt. 
 ### Prerequisites
 - `Python 3.10+`
 - `Pygame` & `SDL2`
